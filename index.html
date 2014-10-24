@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head lang="pl">
+    <meta charset="UTF-8">
+    <title>BLAST demo</title>
+</head>
+<body>
+<script type="text/x-handlebars">
+    <h2>BLAST - demo</h2>
+
+    {{outlet}}
+</script>
+
+<script type="text/x-handlebars" id="index">
+    <!--test view-->
+    <label>Query: </label><span>{{query.sequence}}</span><br/>
+    <label>DNA sequences:</label><br/>
+    <ul>
+    {{#each record in records}}
+        <li>{{record.sequence}}</li>
+    {{else}}
+        <li>There is no database records</li>
+    {{/each}}
+    </ul>
+    <!--TODO implement 'index' view template-->
+</script>
+
+<script type="text/x-handlebars" id="init">
+    <!--TODO implement 'init' view template-->
+</script>
+
+<script type="text/x-handlebars" id="search">
+    <!--TODO implement 'search' view template-->
+</script>
+
+<script type="text/x-handlebars" id="extend">
+    <!--TODO implement 'extend' view template-->
+</script>
+
+<script type="text/x-handlebars" id="result">
+    <!--TODO implement 'result' view template-->
+</script>
+
+<script type="text/javascript" src="js/ext/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/ext/handlebars-1.1.2.js"></script>
+<script type="text/javascript" src="js/ext/ember-1.7.0.js"></script>
+<script type="text/javascript" src="js/ext/ember-data.js"></script>
+<script type="text/javascript" src="js/application.js"></script>
+<script type="text/javascript" src="js/model.js"></script>
+<script type="text/javascript" src="js/fixtures.js"></script>
+<!-- to activate the test runner, add the "?test" query string parameter -->
+<script src="tests/runner.js"></script>
+</body>
+</html>
