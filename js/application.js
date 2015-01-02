@@ -54,14 +54,15 @@ Blast.DataBase = Ember.Object.extend({
 
 Blast.IndexRoute = Ember.Route.extend({
     model: function () {
-        return {
+        return Ember.RSVP.hash({
             //TODO setup view model for 'index'
             query: this.store.find('querySequence', '1'),
-            //TODO somehow call this with what this.store.find('querySequence') returned
-            words: getWords('ACTGACCCATGAACATA', 4),
+            words: this.store.find('querySequence', '1').then(function(query) {
+               return getWords(query.get('sequence'), 4);
+            }),
             //records: this.store.findAll('sequenceRecord')
             records: this.get('db').find('nucleotids')
-        };
+        });
     }
 });
 

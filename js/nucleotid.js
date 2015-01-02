@@ -26,8 +26,6 @@ function createDataBase(size) {
 }
 
 function getWords(nucleotid, wordSize) {
-    console.log(nucleotid);
-    console.log(wordSize);
     var words = [];
     for (var i = 0; i <= nucleotid.length - wordSize; i++) {
         words.pushObject(nucleotid.substr(i, wordSize));
