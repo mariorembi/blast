@@ -14,10 +14,19 @@
 <script type="text/x-handlebars" id="index">
     <!--test view-->
     <label>Query: </label><span>{{query.sequence}}</span><br/>
+    <label>Query words:</label><br/>
+    <ul>
+    {{#each word in words}}
+        <li>{{word}}</li>
+    {{else}}
+        <li>Loading...</li>
+    {{/each}}
+    </ul>
+    <label>Sequence:</label><span>{{words}}</span><br />
     <label>DNA sequences:</label><br/>
     <ul>
     {{#each record in records}}
-        <li>{{record.sequence}}</li>
+        <li>{{record}}</li>
     {{else}}
         <li>There is no database records</li>
     {{/each}}
@@ -48,6 +57,7 @@
 <script type="text/javascript" src="js/application.js"></script>
 <script type="text/javascript" src="js/model.js"></script>
 <script type="text/javascript" src="js/fixtures.js"></script>
+<script type="text/javascript" src="js/nucleotid.js"></script>
 <!-- to activate the test runner, add the "?test" query string parameter -->
 <script src="tests/runner.js"></script>
 </body>
