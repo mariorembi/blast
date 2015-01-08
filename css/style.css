@@ -1,0 +1,6 @@
+html, body {
+    margin: 10px;
+}
+.active {
+    font-weight: bold;
+}
