@@ -8,26 +8,26 @@
 </head>
 <body>
 <script type="text/x-handlebars">
-    <div class="navbar navbar-default">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
                 {{link-to 'BLAST' 'index' class="navbar-brand"}}
             </div>
             <ul class="nav navbar-nav">
                 {{#link-to 'configuration' tagName="li"}}
-                <a {{bind-attr href="view.href"}}>Configuration</a>
+                <a href="#" {{bind-attr href="view.href"}}>Configuration</a>
                 {{/link-to}}
                 {{#each stage in stages}}
                 {{#link-to stage.resource tagName="li" disabled=stage.disabled}}
-                <a {{bind-attr href="view.href"}}>{{stage.name}}</a>
+                <a href="#" {{bind-attr href="view.href"}}>{{stage.name}}</a>
                 {{/link-to}}
                 {{/each}}
                 {{#link-to 'about' tagName="li"}}
-                <a {{bind-attr href="view.href"}}>About</a>
+                <a href="#" {{bind-attr href="view.href"}}>About</a>
                 {{/link-to}}
             </ul>
         </div>
-    </div>
+    </nav>
 
     {{outlet}}
 </script>
@@ -37,16 +37,24 @@
         <div class="form-group">
             <label class="col-sm-1 control-label">Query sequence</label>
             <div class="col-sm-3">
-                {{input value=query.sequence placeholder="Type a DNA sequence" class="form-control"}}
+                {{input value=query.sequence placeholder="Type a DNA sequence" required=true class="form-control"}}
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-1 control-label">Word length</label>
             <div class="col-sm-1">
-                {{input value=wordLength size=3 placeholder="Set length of a word" class="form-control col-xs-2"}}
+                {{input value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control"}}
             </div>
+            <span class="help-block">(K parameter)</span>
         </div>
-        <div class="from-group">
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Score threshold</label>
+            <div class="col-sm-1">
+                {{input value=controllers.application.scoreThreshold size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
+            </div>
+            <span class="help-block">(T parameter)</span>
+        </div>
+        <div class="form-group">
             <label class="col-sm-1 control-label">DNA database records</label>
             <div class="col-sm-3">
                 <ul class="list-group">
@@ -62,24 +70,65 @@
                     <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
                     <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
                 </div>
+                <br/>
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'startAlgorithm'}} class="btn btn-default">Start algorithm</button>
+                </div>
             </div>
         </div>
     </div>
 </script>
 
 <script type="text/x-handlebars" id="init">
-    <!--TODO implement 'init' view template-->
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Query sequence</label>
+            <div class="col-sm-3">
+                {{input value=query.sequence disabled=true class="form-control"}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Word length</label>
+            <div class="col-sm-1">
+                {{input value=controllers.application.wordLength size=2 disabled=true class="form-control"}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Words</label>
+            <div class="col-sm-3">
+                <ul class="list-group">
+                    {{#each word in words}}
+                    <li class="list-group-item">{{word.symbols}}</li>
+                    {{else}}
+                    <comment>(empty)</comment>
+                    {{/each}}
+                </ul>
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'prevStage'}} class="btn btn-default">Previous stage</button>
+                    <button {{action 'resetStage'}} class="btn btn-default">Reset stage</button>
+                    <button {{action 'nextStep'}} class="btn btn-default">Next step</button>
+                    <button {{action 'nextStage'}} class="btn btn-default">Next stage</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="search">
     <!--TODO implement 'search' view template-->
 </script>
 
+<script type="text/x-handlebars" id="evaluation">
+    <!--TODO implement 'extend' view template-->
+</script>
+
 <script type="text/x-handlebars" id="extend">
     <!--TODO implement 'extend' view template-->
 </script>
 
-<script type="text/x-handlebars" id="result">
+<script type="text/x-handlebars" id="results">
     <!--TODO implement 'result' view template-->
 </script>
 

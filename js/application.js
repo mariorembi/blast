@@ -13,44 +13,52 @@ Blast = Ember.Application.create({
     }
 });
 
-Blast.Router.map(function(){
-   this.resource('configuration');
-   this.resource('init');
-   this.resource('search');
-   this.resource('extend');
-   this.resource('result');
-   this.resource('about');
+Blast.Router.map(function () {
+    this.resource('configuration');
+    this.resource('init');
+    this.resource('search');
+    this.resource('evaluation');
+    this.resource('extend');
+    this.resource('results');
+    this.resource('about');
 });
 
 Blast.ApplicationAdapter = DS.FixtureAdapter.extend();
 
 Blast.ApplicationController = Ember.ObjectController.extend({
-   stages: [
-       {
-           name: 'Initialization Stage',
-           resource: 'init',
-           disabled: true
-       },
-       {
-           name: 'Search Stage',
-           resource: 'search',
-           disabled: true
-       },
-       {
-           name: 'Extend Stage',
-           resource: 'extend',
-           disabled: true
-       },
-       {
-           name: 'Result Stage',
-           resource: 'result',
-           disabled: true
-       }
-   ]
+    wordLength: 4,
+    scoreThreshold: 40,
+    stages: [
+        Ember.Object.create({
+            name: 'Initialization Stage',
+            resource: 'init',
+            disabled: true
+        }),
+        Ember.Object.create({
+            name: 'Search Stage',
+            resource: 'search',
+            disabled: true
+        }),
+        Ember.Object.create({
+            name: 'Evaluation Stage',
+            resource: 'evaluation',
+            disabled: true
+        }),
+        Ember.Object.create({
+            name: 'Extend Stage',
+            resource: 'extend',
+            disabled: true
+        }),
+        Ember.Object.create({
+            name: 'Results',
+            resource: 'results',
+            disabled: true
+        })
+    ]
 });
 
 Blast.IndexRoute = Ember.Route.extend({
-    beforeModel: function(){
+    beforeModel: function () {
         this.transitionTo('configuration');
     }
 });
@@ -66,41 +74,66 @@ Blast.ConfigurationRoute = Ember.Route.extend({
 });
 
 Blast.ConfigurationController = Ember.ObjectController.extend({
-    wordLength: 4,
+    needs: ['application'],
     newSequenceRecord: '',
     actions: {
-        removeRecordSequence: function(sequenceRecord) {
+        removeRecordSequence: function (sequenceRecord) {
             sequenceRecord.deleteRecord();
             return false;
         },
-        addRecordSequence: function() {
+        addRecordSequence: function () {
             this.store.createRecord('sequenceRecord', {sequence: this.newSequenceRecord});
-            this.set('newSequenceRecord','');
+            this.set('newSequenceRecord', '');
             return false;
         },
-        removeAllRecords: function() {
+        removeAllRecords: function () {
             this.store.unloadAll('sequenceRecord');
             return false;
+        },
+        startAlgorithm: function () {
+            //TODO update querySequence & enable next stage
+            this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
+            this.transitionToRoute('init');
         }
     }
 });
 
 Blast.InitRoute = Ember.Route.extend({
-    beforeModel: function(){
-        if (this.controllerFor('application').stages.findBy('resource', 'init').disabled) {
+    beforeModel: function () {
+        if (this.controllerFor('application').stages.findBy('resource', 'init').get('disabled')) {
             this.transitionTo('configuration');
         }
     },
     model: function () {
         return {
             //TODO setup view model for 'init'
+            query: this.store.find('querySequence', '1')
         };
     }
 });
 
+Blast.InitController = Ember.ObjectController.extend({
+    needs: ['application'],
+    actions: {
+        prevStage: function () {
+            this.transitionTo('configuration');
+        },
+        resetStage: function () {
+            this.store.unloadAll('word');
+        },
+        nextStep: function () {
+            //TODO check is stage completed & perform step
+        },
+        nextStage: function () {
+            //TODO check is stage completed
+            this.transitionTo('search');
+        }
+    }
+});
+
 Blast.SearchRoute = Ember.Route.extend({
-    beforeModel: function(){
-        if (this.controllerFor('application').stages.findBy('resource', 'search').disabled) {
+    beforeModel: function () {
+        if (this.controllerFor('application').stages.findBy('resource', 'search').get('disabled')) {
             this.transitionTo('init');
         }
     },
@@ -111,10 +144,23 @@ Blast.SearchRoute = Ember.Route.extend({
     }
 });
 
-Blast.ExtendRoute = Ember.Route.extend({
-    beforeModel: function(){
-        if (this.controllerFor('application').stages.findBy('resource', 'extend').disabled) {
+Blast.EvaluationRoute = Ember.Route.extend({
+    beforeModel: function () {
+        if (this.controllerFor('application').stages.findBy('resource', 'evaluation').get('disabled')) {
             this.transitionTo('search');
+        }
+    },
+    model: function () {
+        return {
+            //TODO setup view model for 'search'
+        };
+    }
+});
+
+Blast.ExtendRoute = Ember.Route.extend({
+    beforeModel: function () {
+        if (this.controllerFor('application').stages.findBy('resource', 'extend').get('disabled')) {
+            this.transitionTo('evaluation');
         }
     },
     model: function () {
@@ -124,15 +170,15 @@ Blast.ExtendRoute = Ember.Route.extend({
     }
 });
 
-Blast.ResultRoute = Ember.Route.extend({
-    beforeModel: function(){
-        if (this.controllerFor('application').stages.findBy('resource', 'result').disabled) {
-            this.transitionTo('search');
+Blast.ResultsRoute = Ember.Route.extend({
+    beforeModel: function () {
+        if (this.controllerFor('application').stages.findBy('resource', 'results').get('disabled')) {
+            this.transitionTo('extend');
         }
     },
     model: function () {
         return {
-            //TODO setup view model for 'result'
+            //TODO setup view model for 'results'
         };
     }
 });
