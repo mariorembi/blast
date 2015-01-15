@@ -30,6 +30,13 @@
     </nav>
 
     {{outlet}}
+
+    <div class="btn-group">
+        <button {{action 'prevStage'}} {{bind-attr disabled=prevStageButtonDisabled}} class="btn btn-default">Previous stage</button>
+        <button {{action 'resetStage'}} {{bind-attr disabled=resetStageButtonDisabled}} class="btn btn-default">Reset stage</button>
+        <button {{action 'nextStep'}} {{bind-attr disabled=nextStepButtonDisabled}} class="btn btn-default">Next step</button>
+        <button {{action 'nextStage'}} {{bind-attr disabled=nextStageButtonDisabled}} class="btn btn-default">Next stage</button>
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="configuration">
@@ -70,11 +77,6 @@
                     <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
                     <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
                 </div>
-                <br/>
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'startAlgorithm'}} class="btn btn-default">Start algorithm</button>
-                </div>
             </div>
         </div>
     </div>
@@ -104,32 +106,43 @@
                     <comment>(empty)</comment>
                     {{/each}}
                 </ul>
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'prevStage'}} class="btn btn-default">Previous stage</button>
-                    <button {{action 'resetStage'}} class="btn btn-default">Reset stage</button>
-                    <button {{action 'nextStep'}} class="btn btn-default">Next step</button>
-                    <button {{action 'nextStage'}} class="btn btn-default">Next stage</button>
-                </div>
             </div>
         </div>
     </div>
 </script>
 
 <script type="text/x-handlebars" id="search">
-    <!--TODO implement 'search' view template-->
+    <div class="form-horizontal">
+        <comment>(empty)</comment>
+        <!--TODO implement 'search' view template-->
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="evaluation">
-    <!--TODO implement 'extend' view template-->
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Score threshold</label>
+            <div class="col-sm-1">
+                {{input value=controllers.application.scoreThreshold disabled=true size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
+            </div>
+            <span class="help-block">(T parameter)</span>
+        </div>
+        <!--TODO implement 'extend' view template-->
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="extend">
-    <!--TODO implement 'extend' view template-->
+    <div class="form-horizontal">
+        <comment>(empty)</comment>
+        <!--TODO implement 'extend' view template-->
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="results">
-    <!--TODO implement 'result' view template-->
+    <div class="form-horizontal">
+        <comment>(empty)</comment>
+        <!--TODO implement 'results' view template-->
+    </div>
 </script>
 
 <script type="text/x-handlebars" id="about">

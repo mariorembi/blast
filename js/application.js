@@ -54,7 +54,30 @@ Blast.ApplicationController = Ember.ObjectController.extend({
             resource: 'results',
             disabled: true
         })
-    ]
+    ],
+    prevStageButtonDisabled: true,
+    resetStageButtonDisabled: true,
+    nextStepButtonDisabled: true,
+    nextStageButtonDisabled: true,
+    outletController: null,
+    actions: {
+        prevStage: function () {
+            if (this.outletController) this.outletController._actions.prevStage.apply(this.outletController);
+            return false;
+        },
+        resetStage: function () {
+            if (this.outletController) this.outletController._actions.resetStage.apply(this.outletController);
+            return false;
+        },
+        nextStep: function () {
+            if (this.outletController) this.outletController._actions.nextStep.apply(this.outletController);
+            return false;
+        },
+        nextStage: function () {
+            if (this.outletController) this.outletController._actions.nextStage.apply(this.outletController);
+            return false;
+        }
+    }
 });
 
 Blast.IndexRoute = Ember.Route.extend({
@@ -66,10 +89,17 @@ Blast.IndexRoute = Ember.Route.extend({
 Blast.ConfigurationRoute = Ember.Route.extend({
     model: function () {
         return {
-            //TODO setup view model for 'index'
             query: this.store.find('querySequence', '1'),
             records: this.store.findAll('sequenceRecord')
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', true);
+        appController.set('resetStageButtonDisabled', true);
+        appController.set('nextStepButtonDisabled', true);
+        appController.set('nextStageButtonDisabled', false);
+        appController.set('outletController', controller);
     }
 });
 
@@ -77,6 +107,14 @@ Blast.ConfigurationController = Ember.ObjectController.extend({
     needs: ['application'],
     newSequenceRecord: '',
     actions: {
+        prevStage: Ember.K,
+        resetStage: Ember.K,
+        nextStep: Ember.K,
+        nextStage: function () {
+            //TODO validate configuration, update querySequence
+            this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
+            this.transitionToRoute('init');
+        },
         removeRecordSequence: function (sequenceRecord) {
             sequenceRecord.deleteRecord();
             return false;
@@ -89,11 +127,6 @@ Blast.ConfigurationController = Ember.ObjectController.extend({
         removeAllRecords: function () {
             this.store.unloadAll('sequenceRecord');
             return false;
-        },
-        startAlgorithm: function () {
-            //TODO update querySequence & enable next stage
-            this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
-            this.transitionToRoute('init');
         }
     }
 });
@@ -106,9 +139,17 @@ Blast.InitRoute = Ember.Route.extend({
     },
     model: function () {
         return {
-            //TODO setup view model for 'init'
-            query: this.store.find('querySequence', '1')
+            query: this.store.find('querySequence', '1'),
+            records: this.store.findAll('sequenceRecord')
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', false);
+        appController.set('resetStageButtonDisabled', false);
+        appController.set('nextStepButtonDisabled', false);
+        appController.set('nextStageButtonDisabled', false);
+        appController.set('outletController', controller);
     }
 });
 
@@ -116,7 +157,7 @@ Blast.InitController = Ember.ObjectController.extend({
     needs: ['application'],
     actions: {
         prevStage: function () {
-            this.transitionTo('configuration');
+            this.transitionToRoute('configuration');
         },
         resetStage: function () {
             this.store.unloadAll('word');
@@ -126,7 +167,8 @@ Blast.InitController = Ember.ObjectController.extend({
         },
         nextStage: function () {
             //TODO check is stage completed
-            this.transitionTo('search');
+            this.get('controllers.application.stages').findBy('resource', 'search').set('disabled', false);
+            this.transitionToRoute('search');
         }
     }
 });
@@ -141,6 +183,34 @@ Blast.SearchRoute = Ember.Route.extend({
         return {
             //TODO setup view model for 'search'
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', false);
+        appController.set('resetStageButtonDisabled', false);
+        appController.set('nextStepButtonDisabled', false);
+        appController.set('nextStageButtonDisabled', false);
+        appController.set('outletController', controller);
+    }
+});
+
+Blast.SearchController = Ember.ObjectController.extend({
+    needs: ['application'],
+    actions: {
+        prevStage: function () {
+            this.transitionToRoute('init');
+        },
+        resetStage: function () {
+            //TODO implement
+        },
+        nextStep: function () {
+            //TODO check is stage completed & perform step
+        },
+        nextStage: function () {
+            //TODO check is stage completed
+            this.get('controllers.application.stages').findBy('resource', 'evaluation').set('disabled', false);
+            this.transitionToRoute('evaluation');
+        }
     }
 });
 
@@ -154,6 +224,34 @@ Blast.EvaluationRoute = Ember.Route.extend({
         return {
             //TODO setup view model for 'search'
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', false);
+        appController.set('resetStageButtonDisabled', false);
+        appController.set('nextStepButtonDisabled', false);
+        appController.set('nextStageButtonDisabled', false);
+        appController.set('outletController', controller);
+    }
+});
+
+Blast.EvaluationController = Ember.ObjectController.extend({
+    needs: ['application'],
+    actions: {
+        prevStage: function () {
+            this.transitionToRoute('search');
+        },
+        resetStage: function () {
+            //TODO implement
+        },
+        nextStep: function () {
+            //TODO check is stage completed & perform step
+        },
+        nextStage: function () {
+            //TODO check is stage completed
+            this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', false);
+            this.transitionToRoute('extend');
+        }
     }
 });
 
@@ -167,6 +265,34 @@ Blast.ExtendRoute = Ember.Route.extend({
         return {
             //TODO setup view model for 'extend'
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', false);
+        appController.set('resetStageButtonDisabled', false);
+        appController.set('nextStepButtonDisabled', false);
+        appController.set('nextStageButtonDisabled', false);
+        appController.set('outletController', controller);
+    }
+});
+
+Blast.ExtendController = Ember.ObjectController.extend({
+    needs: ['application'],
+    actions: {
+        prevStage: function () {
+            this.transitionToRoute('evaluation');
+        },
+        resetStage: function () {
+            //TODO implement
+        },
+        nextStep: function () {
+            //TODO check is stage completed & perform step
+        },
+        nextStage: function () {
+            //TODO check is stage completed
+            this.get('controllers.application.stages').findBy('resource', 'results').set('disabled', false);
+            this.transitionToRoute('results');
+        }
     }
 });
 
@@ -180,5 +306,25 @@ Blast.ResultsRoute = Ember.Route.extend({
         return {
             //TODO setup view model for 'results'
         };
+    },
+    setupController: function (controller, model) {
+        var appController = controller.get('controllers.application');
+        appController.set('prevStageButtonDisabled', false);
+        appController.set('resetStageButtonDisabled', true);
+        appController.set('nextStepButtonDisabled', true);
+        appController.set('nextStageButtonDisabled', true);
+        appController.set('outletController', controller);
+    }
+});
+
+Blast.ResultsController = Ember.ObjectController.extend({
+    needs: ['application'],
+    actions: {
+        prevStage: function () {
+            this.transitionToRoute('extend');
+        },
+        resetStage: Ember.K,
+        nextStep: Ember.K,
+        nextStage: Ember.K
     }
 });
