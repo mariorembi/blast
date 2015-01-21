@@ -94,6 +94,7 @@ Blast.ConfigurationRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', true);
         appController.set('resetStageButtonDisabled', true);
@@ -144,6 +145,7 @@ Blast.InitRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', false);
         appController.set('resetStageButtonDisabled', false);
@@ -185,6 +187,7 @@ Blast.SearchRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', false);
         appController.set('resetStageButtonDisabled', false);
@@ -226,6 +229,7 @@ Blast.EvaluationRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', false);
         appController.set('resetStageButtonDisabled', false);
@@ -267,6 +271,7 @@ Blast.ExtendRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', false);
         appController.set('resetStageButtonDisabled', false);
@@ -308,6 +313,7 @@ Blast.ResultsRoute = Ember.Route.extend({
         };
     },
     setupController: function (controller, model) {
+        this._super(controller, model);
         var appController = controller.get('controllers.application');
         appController.set('prevStageButtonDisabled', false);
         appController.set('resetStageButtonDisabled', true);

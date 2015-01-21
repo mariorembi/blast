@@ -1,6 +1,11 @@
 html, body {
     margin: 10px;
 }
+
 .active {
     font-weight: bold;
+}
+
+pre {
+    word-wrap: normal;
 }
