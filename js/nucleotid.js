@@ -35,15 +35,14 @@ function wordSplit(sequence, wordSize) {
 
 function wordRecordHit(record, word) {
 	var hits = [];
-	var off = record.indexOf(word);
-	if (off == -1) {
-		return hits;
+	var off = 0;
+	var ind;
+
+	while ((index = record.indexOf(word, off)) > -1) {
+		hits.push(index);
+		off = index + word.length;
 	}
-	hits.pushObject(off);
-	// hits won't overlap
-	var nextHits = wordHit(record.substr(off + wordSize), word);
-	if (nextHits.length > 0)
-		hits.concat(nextHits);
+
 	return hits;
 }
 
@@ -51,13 +50,14 @@ function wordDBHits(database, word) {
 	var hits = [];
 	for (id = 0; id < database.length; id++) {
 		var hitsPerRecord = wordRecordHit(database[id], word);
-		if (hitsPerRecord.length > 0)
+		if (hitsPerRecord.length > 0) {
 			hits.pushObject({id: id, hits: hitsPerRecord});
+		}
 	}
 	return hits;
 }
 
-var countScore(a, b, similarityMatrix) {
+function countScore(a, b, similarityMatrix) {
 	if (a.length != b.length)
 		return 0;
 	var score = 0;
@@ -87,7 +87,7 @@ function Expander () {
 	var expandRight = [];
 	var expandLeft = [];
 	
-	this.init() {
+	this.init = function() {
 		this.leftOff = this.word.off - 1;
 		if (this.leftOff < 0)
 			this.leftOff = 0;
@@ -98,15 +98,14 @@ function Expander () {
 		wordScore = countScore(this.word.str, this.word.str, similarityMatrix);
 	}
 	//public
-	this.getNext() {
+	this.getNext = function() {
+		return {left: {score: [0], penalty: [0]}, right: {score: [0], penalty: [0]}};
+	}
+	this.getAll = function() {
 		return {left: {score: [0], penalty: [0]}, right: {score: [0], penalty: [0]}};
 		
 	}
-	this.getAll() {
-		return {left: {score: [0], penalty: [0]}, reight: {score: [0], penalty: [0]}};
-		
-	}
-	this.getResult() {
+	this.getResult = function() {
 		return {score: 4, from: 0, to: 1};
 	}
 	
