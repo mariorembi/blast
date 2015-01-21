@@ -29,3 +29,38 @@ test("/", function() {
     ok(find("li").length > 0, "There are some DB records in the list");
   });
 });
+
+module("Unit: Algorithm tests");
+
+test('word splitting-size 1', function(){
+    var sequence = 'ACTGACATCA';
+    var words = wordSplit(sequence, 1);
+
+    for (var i = 0; i < sequence.length; i++) {
+        equal(words[i].str[0], sequence[i], "Sequence ok");
+        equal(words[i].off, i, "Offset ok");
+    }
+});
+
+test('word splitting-size whole', function() {
+    var sequence = 'ACCTG';
+    var words = wordSplit(sequence, sequence.length);
+
+    equal(words.length, 1, "Words length ok");
+    equal(words[0].str, sequence, "Sequence ok");
+    equal(words[0].off, 0, "Offset ok");
+})
+
+test('database search', function() {
+	var word = 'AAAA';
+	var database = ['AAAATTTTAAAA', 'TTTTTTTTTTT', 'TTTTAAAATTTT'];
+	
+	var result = wordDBHits(database, word);
+	equal(result.length, 2, 'Wrong amount of hits found in database');
+	equal(result[0].id, 0, 'Hit not found, but should');
+	equal(result[0].hits.length, 2, 'Wrong amount of hits found for record');
+	equal(result[0].hits[0], 0, 'Wrong hit found');
+	equal(result[0].hits[1], 8, 'Wrong hit found');
+	equal(result[1].hits.length, 1, 'Wrong amount of hits found for record');
+	equal(result[1].hits[0], 4, 'Wrong hit found');
+})
