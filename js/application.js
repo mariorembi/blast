@@ -225,6 +225,7 @@ Blast.ExtendRoute = Ember.Route.extend({
                     word: 'ACT',
                     records: [
                         Ember.Object.create({
+                            active: true,
                             sequencePrefixView: 'AAA',
                             sequenceMatchView: 'BBB',
                             sequenceSuffixView: 'CCC',
@@ -235,6 +236,7 @@ Blast.ExtendRoute = Ember.Route.extend({
                             dropOffView: '  00 00  '
                         }),
                         Ember.Object.create({
+                            active: false,
                             sequencePrefixView: 'AAA',
                             sequenceMatchView: 'BBB',
                             sequenceSuffixView: 'CCC',
@@ -250,6 +252,7 @@ Blast.ExtendRoute = Ember.Route.extend({
                     word: 'ACT',
                     records: [
                         Ember.Object.create({
+                            active: false,
                             sequencePrefixView: 'AAA',
                             sequenceMatchView: 'BBB',
                             sequenceSuffixView: 'CCC',
@@ -260,6 +263,7 @@ Blast.ExtendRoute = Ember.Route.extend({
                             dropOffView: '  00 00  '
                         }),
                         Ember.Object.create({
+                            active: false,
                             sequencePrefixView: 'AAA',
                             sequenceMatchView: 'BBB',
                             sequenceSuffixView: 'CCC',
@@ -348,4 +352,10 @@ Blast.ResultsController = Ember.ObjectController.extend({
 Ember.Handlebars.helper('highlight', function(value, options) {
     var escaped = Handlebars.Utils.escapeExpression(value);
     return new Ember.Handlebars.SafeString('<span class="highlight">' + escaped + '</span>');
+});
+
+Blast.RecordExtensionComponent = Ember.Component.extend({
+    tagName: 'pre',
+    classNameBindings: ['highlightRecord'],
+    highlightRecord: false
 });

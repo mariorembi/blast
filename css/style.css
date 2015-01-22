@@ -10,6 +10,10 @@ html, body {
     color: red;
     font-weight: bold;
 }
+
+.highlight-record {
+    border: 2px solid #5bc0de;
+}
 pre {
     word-wrap: normal;
 }

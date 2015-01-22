@@ -80,78 +80,6 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-1 control-label">DNA database records</label>
-            <div class="col-sm-3">
-                <ul class="list-group">
-                    {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
-                    {{else}}
-                    <comment>There is no database records</comment>
-                    {{/each}}
-                </ul>
-                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
-                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-1 control-label">DNA database records</label>
-            <div class="col-sm-3">
-                <ul class="list-group">
-                    {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
-                    {{else}}
-                    <comment>There is no database records</comment>
-                    {{/each}}
-                </ul>
-                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
-                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-1 control-label">DNA database records</label>
-            <div class="col-sm-3">
-                <ul class="list-group">
-                    {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
-                    {{else}}
-                    <comment>There is no database records</comment>
-                    {{/each}}
-                </ul>
-                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
-                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-1 control-label">DNA database records</label>
-            <div class="col-sm-3">
-                <ul class="list-group">
-                    {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
-                    {{else}}
-                    <comment>There is no database records</comment>
-                    {{/each}}
-                </ul>
-                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
-                <br/>
-                <div class="btn-group">
-                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
-                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
-                </div>
-            </div>
-        </div>
     </div>
 </script>
 
@@ -213,7 +141,7 @@ ATT
             <label class="col-sm-1 control-label">Matched records</label>
             <div class="col-sm-11">
                 {{#each record in wordGroup.records}}
-                {{record-extension record=record}}
+                {{record-extension record=record highlightRecord=record.active}}
                 {{/each}}
             </div>
         </div>
@@ -248,11 +176,11 @@ ATT
     This Web application presents BLAST algorithm for DNA sequences matching...
 </script>
 
-<script type="text/x-handlebars" id="components/record-extension"><pre>
+<script type="text/x-handlebars" id="components/record-extension">
 Record:         {{record.sequencePrefixView}}{{highlight record.sequenceMatchView}}{{record.sequenceSuffixView}}
 Query:          {{record.queryPrefixView}}{{highlight record.queryMatchView}}{{record.querySuffixView}}
 Score:          {{record.scoreView}}
-Drop off score: {{record.dropOffView}}</pre>
+Drop off score: {{record.dropOffView}}
 </script>
 
 <script type="text/javascript" src="js/ext/jquery-1.10.2.js"></script>
