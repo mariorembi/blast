@@ -17,7 +17,6 @@ Blast.Router.map(function () {
     this.resource('configuration');
     this.resource('init');
     this.resource('search');
-    this.resource('evaluation');
     this.resource('extend');
     this.resource('results');
     this.resource('about');
@@ -40,19 +39,14 @@ Blast.ApplicationController = Ember.ObjectController.extend({
             disabled: true
         }),
         Ember.Object.create({
-            name: 'Evaluation Stage',
-            resource: 'evaluation',
-            disabled: true
-        }),
-        Ember.Object.create({
             name: 'Extend Stage',
             resource: 'extend',
-            disabled: true
+            disabled: false
         }),
         Ember.Object.create({
             name: 'Results',
             resource: 'results',
-            disabled: true
+            disabled: false
         })
     ],
     prevStageButtonDisabled: true,
@@ -211,48 +205,6 @@ Blast.SearchController = Ember.ObjectController.extend({
         },
         nextStage: function () {
             //TODO check is stage completed
-            this.get('controllers.application.stages').findBy('resource', 'evaluation').set('disabled', false);
-            this.transitionToRoute('evaluation');
-        }
-    }
-});
-
-Blast.EvaluationRoute = Ember.Route.extend({
-    beforeModel: function () {
-        if (this.controllerFor('application').stages.findBy('resource', 'evaluation').get('disabled')) {
-            this.transitionTo('search');
-        }
-    },
-    model: function () {
-        return {
-            //TODO setup view model for 'search'
-        };
-    },
-    setupController: function (controller, model) {
-        this._super(controller, model);
-        var appController = controller.get('controllers.application');
-        appController.set('prevStageButtonDisabled', false);
-        appController.set('resetStageButtonDisabled', false);
-        appController.set('nextStepButtonDisabled', false);
-        appController.set('nextStageButtonDisabled', false);
-        appController.set('outletController', controller);
-    }
-});
-
-Blast.EvaluationController = Ember.ObjectController.extend({
-    needs: ['application'],
-    actions: {
-        prevStage: function () {
-            this.transitionToRoute('search');
-        },
-        resetStage: function () {
-            //TODO implement
-        },
-        nextStep: function () {
-            //TODO check is stage completed & perform step
-        },
-        nextStage: function () {
-            //TODO check is stage completed
             this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', false);
             this.transitionToRoute('extend');
         }
@@ -262,12 +214,64 @@ Blast.EvaluationController = Ember.ObjectController.extend({
 Blast.ExtendRoute = Ember.Route.extend({
     beforeModel: function () {
         if (this.controllerFor('application').stages.findBy('resource', 'extend').get('disabled')) {
-            this.transitionTo('evaluation');
+            this.transitionTo('search');
         }
     },
     model: function () {
         return {
             //TODO setup view model for 'extend'
+            wordGroups: [
+                Ember.Object.create({
+                    word: 'ACT',
+                    records: [
+                        Ember.Object.create({
+                            sequencePrefixView: 'AAA',
+                            sequenceMatchView: 'BBB',
+                            sequenceSuffixView: 'CCC',
+                            queryPrefixView: 'AAA',
+                            queryMatchView: 'BBB',
+                            querySuffixView: 'CCC',
+                            scoreView: '  43 34  ',
+                            dropOffView: '  00 00  '
+                        }),
+                        Ember.Object.create({
+                            sequencePrefixView: 'AAA',
+                            sequenceMatchView: 'BBB',
+                            sequenceSuffixView: 'CCC',
+                            queryPrefixView: 'AAA',
+                            queryMatchView: 'BBB',
+                            querySuffixView: 'CCC',
+                            scoreView: '  43 34  ',
+                            dropOffView: '  00 00  '
+                        })
+                    ]
+                }),
+                Ember.Object.create({
+                    word: 'ACT',
+                    records: [
+                        Ember.Object.create({
+                            sequencePrefixView: 'AAA',
+                            sequenceMatchView: 'BBB',
+                            sequenceSuffixView: 'CCC',
+                            queryPrefixView: 'AAA',
+                            queryMatchView: 'BBB',
+                            querySuffixView: 'CCC',
+                            scoreView: '  43 34  ',
+                            dropOffView: '  00 00  '
+                        }),
+                        Ember.Object.create({
+                            sequencePrefixView: 'AAA',
+                            sequenceMatchView: 'BBB',
+                            sequenceSuffixView: 'CCC',
+                            queryPrefixView: 'AAA',
+                            queryMatchView: 'BBB',
+                            querySuffixView: 'CCC',
+                            scoreView: '  43 34  ',
+                            dropOffView: '  00 00  '
+                        })
+                    ]
+                })
+            ]
         };
     },
     setupController: function (controller, model) {
@@ -309,7 +313,13 @@ Blast.ResultsRoute = Ember.Route.extend({
     },
     model: function () {
         return {
+            query: this.store.find('querySequence', '1'),
             //TODO setup view model for 'results'
+            results: [
+                Ember.Object.create({prefix: 'AAA', match: 'BBB', suffix: 'CCC'}),
+                Ember.Object.create({prefix: 'AAA', match: 'BBB', suffix: 'CCC'}),
+                Ember.Object.create({prefix: 'AAA', match: 'BBB', suffix: 'CCC'})
+            ]
         };
     },
     setupController: function (controller, model) {
@@ -333,4 +343,9 @@ Blast.ResultsController = Ember.ObjectController.extend({
         nextStep: Ember.K,
         nextStage: Ember.K
     }
+});
+
+Ember.Handlebars.helper('highlight', function(value, options) {
+    var escaped = Handlebars.Utils.escapeExpression(value);
+    return new Ember.Handlebars.SafeString('<span class="highlight">' + escaped + '</span>');
 });

@@ -6,6 +6,10 @@ html, body {
     font-weight: bold;
 }
 
+.highlight {
+    color: red;
+    font-weight: bold;
+}
 pre {
     word-wrap: normal;
 }

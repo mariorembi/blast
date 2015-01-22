@@ -28,10 +28,11 @@
             </ul>
         </div>
     </nav>
-
+    <div style="margin-bottom: 70px;">
     {{outlet}}
+    </div>
 
-    <div class="btn-group">
+    <div class="btn-group" style="position: fixed; bottom: 0; height: 50px; background-color: #fff; display: block; width: 100%;">
         <button {{action 'prevStage'}} {{bind-attr disabled=prevStageButtonDisabled}} class="btn btn-default">Previous stage</button>
         <button {{action 'resetStage'}} {{bind-attr disabled=resetStageButtonDisabled}} class="btn btn-default">Reset stage</button>
         <button {{action 'nextStep'}} {{bind-attr disabled=nextStepButtonDisabled}} class="btn btn-default">Next step</button>
@@ -60,6 +61,78 @@
                 {{input value=controllers.application.scoreThreshold size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
             </div>
             <span class="help-block">(T parameter)</span>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">DNA database records</label>
+            <div class="col-sm-3">
+                <ul class="list-group">
+                    {{#each record in records}}
+                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
+                    {{else}}
+                    <comment>There is no database records</comment>
+                    {{/each}}
+                </ul>
+                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
+                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">DNA database records</label>
+            <div class="col-sm-3">
+                <ul class="list-group">
+                    {{#each record in records}}
+                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
+                    {{else}}
+                    <comment>There is no database records</comment>
+                    {{/each}}
+                </ul>
+                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
+                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">DNA database records</label>
+            <div class="col-sm-3">
+                <ul class="list-group">
+                    {{#each record in records}}
+                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
+                    {{else}}
+                    <comment>There is no database records</comment>
+                    {{/each}}
+                </ul>
+                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
+                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">DNA database records</label>
+            <div class="col-sm-3">
+                <ul class="list-group">
+                    {{#each record in records}}
+                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
+                    {{else}}
+                    <comment>There is no database records</comment>
+                    {{/each}}
+                </ul>
+                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
+                <br/>
+                <div class="btn-group">
+                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
+                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
+                </div>
+            </div>
         </div>
         <div class="form-group">
             <label class="col-sm-1 control-label">DNA database records</label>
@@ -109,6 +182,15 @@
             </div>
         </div>
     </div>
+    <pre>ATTAGACACT
+ATT
+ TTA
+  TAG
+   AGA
+    GAC
+     ACA
+      CAC
+       ACT</pre>
 </script>
 
 <script type="text/x-handlebars" id="search">
@@ -118,35 +200,59 @@
     </div>
 </script>
 
-<script type="text/x-handlebars" id="evaluation">
-    <div class="form-horizontal">
-        <div class="form-group">
-            <label class="col-sm-1 control-label">Score threshold</label>
-            <div class="col-sm-1">
-                {{input value=controllers.application.scoreThreshold disabled=true size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
-            </div>
-            <span class="help-block">(T parameter)</span>
-        </div>
-        <!--TODO implement 'extend' view template-->
-    </div>
-</script>
-
 <script type="text/x-handlebars" id="extend">
     <div class="form-horizontal">
-        <comment>(empty)</comment>
-        <!--TODO implement 'extend' view template-->
+    {{#each wordGroup in wordGroups}}
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Word</label>
+            <div class="col-sm-1">
+                {{input value=wordGroup.word disabled=true class="form-control"}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Matched records</label>
+            <div class="col-sm-11">
+                {{#each record in wordGroup.records}}
+                {{record-extension record=record}}
+                {{/each}}
+            </div>
+        </div>
+    {{/each}}
     </div>
 </script>
 
 <script type="text/x-handlebars" id="results">
     <div class="form-horizontal">
-        <comment>(empty)</comment>
-        <!--TODO implement 'results' view template-->
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Query sequence</label>
+            <div class="col-sm-3">
+                {{input value=query.sequence disabled=true class="form-control"}}
+            </div>
+        </div>
+        <div class="form-group">
+        <label class="col-sm-1 control-label">Best matching results</label>
+            <div class="col-sm-1">
+                <ul class="list-group">
+                    {{#each result in results}}
+                    <li class="list-group-item">{{result.prefix}}{{highlight result.match}}{{result.suffix}}</li>
+                    {{else}}
+                    <comment>(empty)</comment>
+                    {{/each}}
+                </ul>
+        </div>
+        </div>
     </div>
 </script>
 
 <script type="text/x-handlebars" id="about">
     This Web application presents BLAST algorithm for DNA sequences matching...
+</script>
+
+<script type="text/x-handlebars" id="components/record-extension"><pre>
+Record:         {{record.sequencePrefixView}}{{highlight record.sequenceMatchView}}{{record.sequenceSuffixView}}
+Query:          {{record.queryPrefixView}}{{highlight record.queryMatchView}}{{record.querySuffixView}}
+Score:          {{record.scoreView}}
+Drop off score: {{record.dropOffView}}</pre>
 </script>
 
 <script type="text/javascript" src="js/ext/jquery-1.10.2.js"></script>
