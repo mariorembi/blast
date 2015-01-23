@@ -39,27 +39,59 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         return this.get('record.active');
     }.property('record.active'),
     sequencePrefixView: function () {
-        return this.get('record.sequencePrefixView');
-    }.property('record.sequence'),
+        var diff = this.get('record.queryRange.from') - this.get('record.sequenceRange.from');
+        var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
+        return blankPrefix + this.get('record.sequence').substr(0, this.get('record.sequenceRange.from'));
+    }.property('record.sequence', 'record.sequenceRange.from', 'record.queryRange.from'),
     sequenceMatchView: function () {
-        return this.get('record.sequenceMatchView');
-    }.property('record.sequence'),
+        return this.get('record.sequence').substr(this.get('record.sequenceRange.from'), this.get('record.sequenceRange.length'));
+    }.property('record.sequence', 'record.sequenceRange.from', 'record.sequenceRange.length'),
     sequenceSuffixView: function () {
-        return this.get('record.sequenceSuffixView');
-    }.property('record.sequence'),
+        return this.get('record.sequence').substr(this.get('record.sequenceRange.from') + this.get('record.sequenceRange.length'));
+    }.property('record.sequence', 'record.sequenceRange.from', 'record.sequenceRange.length'),
     queryPrefixView: function () {
-        return this.get('record.queryPrefixView');
-    }.property('record.query'),
+        var diff = this.get('record.sequenceRange.from') - this.get('record.queryRange.from');
+        var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
+        return blankPrefix + this.get('record.query').substr(0, this.get('record.queryRange.from'));
+    }.property('record.query', 'record.queryRange.from', 'record.sequenceRange.from'),
     queryMatchView: function () {
-        return this.get('record.queryMatchView');
-    }.property('record.query'),
+        return this.get('record.query').substr(this.get('record.queryRange.from'), this.get('record.queryRange.length'));
+    }.property('record.query', 'record.queryRange.from', 'record.queryRange.length'),
     querySuffixView: function () {
-        return this.get('record.querySuffixView');
-    }.property('record.query'),
+        return this.get('record.query').substr(this.get('record.queryRange.from') + this.get('record.queryRange.length'));
+    }.property('record.query', 'record.queryRange.from', 'record.queryRange.length'),
     scoreView: function () {
-        return this.get('record.scoreView');
-    }.property('record.score'),
+        var scoreStr = ' '.repeat(Math.max(this.get('record.sequenceRange.from'), this.get('record.queryRange.from')));
+        var leftScore = this.get('record.leftExtension.score');
+        scoreStr += leftScore.reverse().join('');
+        var rightScore = this.get('record.rightExtension.score');
+        //FIXME blank space between scores
+        scoreStr += ' '.repeat(this.get('record.queryRange.length') - leftScore.length - rightScore.length);
+        scoreStr += rightScore.join('');
+        return scoreStr;
+    }.property('record.leftExtension.score', 'record.rightExtension.score', 'record.sequenceRange.from', 'record.queryRange.from', 'record.queryRange.length'),
     dropOffView: function () {
-        return this.get('record.dropOffView');
-    }.property('record.dropOff')
+        var scoreStr = ' '.repeat(Math.max(this.get('record.sequenceRange.from'), this.get('record.queryRange.from')));
+        var leftDropOff = this.get('record.leftExtension.dropOff');
+        var rightDropOff = this.get('record.rightExtension.dropOff');
+        scoreStr += leftDropOff.reverse().join('');
+        //FIXME blank space between drop-offs
+        scoreStr += ' '.repeat(this.get('record.queryRange.length') - leftDropOff.length - rightDropOff.length);
+        scoreStr += rightDropOff.join('');
+        return scoreStr;
+    }.property('record.leftExtension.dropOff', 'record.rightExtension.dropOff', 'record.sequenceRange.from', 'record.queryRange.from', 'record.queryRange.length')
 });
+
+Blast.ResultItemComponent = Ember.Component.extend({
+    tagName: "li",
+    classNames: ['list-group-item'],
+    prefix: function(){
+        return this.get('result.record.sequence').substr(0, this.get('result.startOffset'));
+    }.property('result.record.sequence', 'result.startOffset'),
+    match: function(){
+        return this.get('result.record.sequence').substring(this.get('result.startOffset'), this.get('result.endOffset'));
+    }.property('result.record.sequence', 'result.startOffset', 'result.endOffset'),
+    suffix: function(){
+        return this.get('result.record.sequence').substr(this.get('result.endOffset'));
+    }.property('result.record.sequence', 'result.endOffset')
+})

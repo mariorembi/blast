@@ -25,8 +25,8 @@ test("/", function() {
 
   // helper waiting the application is idle before running the callback
   andThen(function() {
-    equal(find("h2").text(), "BLAST - demo", "Main application header rendered");
-    ok(find("li").length > 0, "There are some DB records in the list");
+    ok(find("nav").length > 0, "Main application navigation panel rendered");
+    ok(find("#stage-navigator").length > 0, "Stage navigation panel rendered");
   });
 });
 

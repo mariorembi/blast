@@ -172,3 +172,6 @@ Blast.Scoring.FIXTURES = [
         score: 1
     }
 ];
+
+//empty array is required
+Blast.Result.FIXTURES = [];

@@ -28,6 +28,12 @@ Blast.SequenceRecord = DS.Model.extend({
     sequence: DS.attr('string')
 });
 
+Blast.Result = DS.Model.extend({
+    record: DS.belongsTo('sequenceRecord'),
+    startOffset: DS.attr('number'),
+    endOffset: DS.attr('number')
+});
+
 /**
  * Definicja encji opisującej ocenę za dopasowanie jednego symbolu słowa wyszukiwanej sekwencji do symbolu sekwencji<br/>
  * Ocena dodatnia oznacza nagrodę, natomiast ujemna - karę za błędne dopasowanie symbolu

@@ -32,7 +32,7 @@
     {{outlet}}
     </div>
 
-    <div class="btn-group" style="position: fixed; bottom: 0; height: 50px; background-color: #fff; display: block; width: 100%;">
+    <div id="stage-navigator" class="btn-group" style="position: fixed; bottom: 0; height: 50px; background-color: #fff; display: block; width: 100%;">
         <button {{action 'prevStage'}} {{bind-attr disabled=prevStageButtonDisabled}} class="btn btn-default">Previous stage</button>
         <button {{action 'resetStage'}} {{bind-attr disabled=resetStageButtonDisabled}} class="btn btn-default">Reset stage</button>
         <button {{action 'nextStep'}} {{bind-attr disabled=nextStepButtonDisabled}} class="btn btn-default">Next step</button>
@@ -53,14 +53,12 @@
             <div class="col-sm-3">
                 {{input value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control"}}
             </div>
-            <span class="help-block">(K parameter)</span>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">Score threshold</label>
+            <label class="col-sm-3 control-label">Score drop off</label>
             <div class="col-sm-3">
-                {{input value=controllers.application.scoreThreshold size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
+                {{input value=controllers.application.scoreDropOff size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
             </div>
-            <span class="help-block">(T parameter)</span>
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">DNA database records</label>
@@ -117,6 +115,10 @@
 
 <script type="text/x-handlebars" id="extend">
     <div class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Scoring matrix</label>
+            {{scoring-matrix symbols=symbols scoring=scoring disabled=true class="col-sm-9"}}
+        </div>
     {{#each wordGroup in wordGroups}}
         <div class="form-group">
             <label class="col-sm-1 control-label">Word</label>
@@ -149,12 +151,12 @@
             <div class="col-sm-1">
                 <ul class="list-group">
                     {{#each result in results}}
-                    <li class="list-group-item">{{result.prefix}}{{highlight result.match}}{{result.suffix}}</li>
+                        {{result-item result=result}}
                     {{else}}
-                    <comment>(empty)</comment>
+                        <comment>(no matches)</comment>
                     {{/each}}
                 </ul>
-        </div>
+            </div>
         </div>
     </div>
 </script>
@@ -191,6 +193,10 @@ Record:         {{sequencePrefixView}}{{highlight sequenceMatchView}}{{sequenceS
 Query:          {{queryPrefixView}}{{highlight queryMatchView}}{{querySuffixView}}
 Score:          {{scoreView}}
 Drop off score: {{dropOffView}}
+</script>
+
+<script type="text/x-handlebars" id="components/result-item">
+    {{prefix}}{{highlight match}}{{suffix}}
 </script>
 
 <script type="text/javascript" src="js/ext/jquery-1.10.2.js"></script>
