@@ -84,7 +84,9 @@ Blast.ConfigurationRoute = Ember.Route.extend({
     model: function () {
         return {
             query: this.store.find('querySequence', '1'),
-            records: this.store.findAll('sequenceRecord')
+            records: this.store.findAll('sequenceRecord'),
+            symbols: this.store.findAll('sequenceSymbol'),
+            scoring: this.store.findAll('scoring')
         };
     },
     setupController: function (controller, model) {
@@ -135,7 +137,7 @@ Blast.InitRoute = Ember.Route.extend({
     model: function () {
         return {
             query: this.store.find('querySequence', '1'),
-            records: this.store.findAll('sequenceRecord')
+            words: this.store.findAll('word')
         };
     },
     setupController: function (controller, model) {
@@ -347,15 +349,4 @@ Blast.ResultsController = Ember.ObjectController.extend({
         nextStep: Ember.K,
         nextStage: Ember.K
     }
-});
-
-Ember.Handlebars.helper('highlight', function(value, options) {
-    var escaped = Handlebars.Utils.escapeExpression(value);
-    return new Ember.Handlebars.SafeString('<span class="highlight">' + escaped + '</span>');
-});
-
-Blast.RecordExtensionComponent = Ember.Component.extend({
-    tagName: 'pre',
-    classNameBindings: ['highlightRecord'],
-    highlightRecord: false
 });
