@@ -67,55 +67,63 @@ test('database search', function() {
 	equal(result[1].hits[0], 4, 'Offset of hit');
 })
 
+var test_expanding = function(sequence, record, expectedLeft, map, expectedRight, expectedResult) {
+    var expandTest = new Expander();
+    ok(expandTest, 'Created Expander object');
+    expandTest.word = {off: {sequence: 3, record: 6}, size: 3, str: 'AAA'};
+    expandTest.sequence = sequence;
+    expandTest.record = record;
+    expandTest.maxPenalty = 2;
+
+    expandTest.similarityMatrix = map;
+
+
+
+    var initResult = expandTest.init();
+    equal(initResult.left.score.length, 1, "Init score ok");
+    equal(initResult.right.score.length, 1, "Init score ok");
+    equal(initResult.left.penalty.length, 1, "Init penalty ok");
+    equal(initResult.right.penalty.length, 1, "Init penalty ok");
+    equal(initResult.right.score[0], expectedRight.score[0], "Init score value ok");
+    equal(initResult.left.score[0], expectedLeft.score[0], "Init score value ok");
+    equal(initResult.right.penalty[0], expectedRight.penalty[0], "Init penalty value ok");
+    equal(initResult.left.penalty[0], expectedLeft.penalty[0], "Init penalty value ok");
+    var expectedLeftSize = 2;
+    var expectedRightSize = 2;
+    var stepResult = initResult;
+    for (var i = 1; i < 10; i++) {
+        if ((stepResult = expandTest.getNext()) == null)
+            break;
+        ok(stepResult != null, "Step result gathered");
+        equal(stepResult.left.score.length, expectedLeftSize, "Step incrementation ok");
+        equal(stepResult.right.score.length, expectedRightSize, "Step incrementation ok");
+        equal(stepResult.left.penalty[i], expectedLeft.penalty[i], "Step penalty ok");
+        equal(stepResult.left.score[i], expectedLeft.score[i], "Step score ok");
+        equal(stepResult.right.penalty[i], expectedRight.penalty[i], "Step penalty ok");
+        equal(stepResult.right.score[i], expectedRight.score[i], "Step score ok");
+        expectedLeftSize = Math.min(expectedLeftSize + 1, expectedLeft.score.length);
+        expectedRightSize = Math.min(expectedRightSize + 1, expectedRight.score.length);
+    }
+
+    equal(i, Math.max(expectedLeft.score.length, expectedRight.score.length));
+    var result = expandTest.getResult();
+    deepEqual(result, expectedResult, "Result ok");
+}
+
 test('expander-simple', function() {
 	var sequence = 'TTTAAATTT';
 	var record = 'GGGGGGAAAGGGGGG';
-	
-	var expandTest = new Expander();
-	ok(expandTest, 'Created Expander object');
-	expandTest.word = {off: {sequence: 3, record: 6}, size: 3, str: 'AAA'};
-	expandTest.sequence = sequence;
-    expandTest.record = record;
-	expandTest.maxPenalty = 2;
+    var expectedLeft = {score: [3,2,1], penalty: [0, 1, 2]};
+    var expectedRight = expectedLeft;
+    var expectedResult = {score: 3, sequenceOff: 3, recordOff: 6, size: 3};
+
     var map = {
         'A' : {'A' : 1, 'C' : -1, 'G' : -1, 'T' : -1},
         'C' : {'A' : -1, 'C' : 1, 'G' : -1, 'T' : -1},
         'G' : {'A' : -1, 'C' : -1, 'G' : 1, 'T' : -1},
         'T' : {'A' : -1, 'C' : -1, 'G' : -1, 'T' : 1}
     };
-    expandTest.similarityMatrix = map;
 
-	var initResult = expandTest.init();
-    equal(initResult.left.score.length, 1, "Init score ok");
-    equal(initResult.right.score.length, 1, "Init score ok");
-    equal(initResult.left.penalty.length, 1, "Init penalty ok");
-    equal(initResult.right.penalty.length, 1, "Init penalty ok");
-    equal(initResult.right.score[0], 3, "Init score value ok");
-    equal(initResult.left.score[0], 3, "Init score value ok");
-    equal(initResult.right.penalty[0], 0, "Init penalty value ok");
-    equal(initResult.left.penalty[0], 0, "Init penalty value ok");
-    var expected_score = 2;
-    var expected_penalty = 1;
-    var stepInd = 1;
-    for (var i = 0; i < 10; i++) {
-        if ((stepResult = expandTest.getNext()) == null)
-            break;
-        ok(stepResult != null, "Step result gathered");
+    test_expanding(sequence, record, expectedLeft, map, expectedRight, expectedResult);
 
-        equal(stepResult.left.score.length, stepInd + 1, "Step incrementation ok");
-        equal(stepResult.right.score.length, stepInd + 1, "Step incrementation ok");
-        equal(stepResult.left.penalty[stepInd], expected_penalty, "Step penalty ok");
-        equal(stepResult.left.score[stepInd], expected_score, "Step score ok");
-        equal(stepResult.right.penalty[stepInd], expected_penalty, "Step penalty ok");
-        equal(stepResult.right.score[stepInd], expected_score, "Step score ok");
-        stepInd++;
-        expected_penalty++;
-        expected_score--;
-    }
-
-    equal(i, 2, "Max penalty ok");
-    //expandTest.getAll();
-	equal(expandTest.getResult().score, 3, 'Score match');
-	equal(expandTest.getResult().sequenceOff, 3, "Best result from");
-	equal(expandTest.getResult().recordOff, 6, "Best result to");
 })

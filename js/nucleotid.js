@@ -193,8 +193,26 @@ function Expander () {
         console.log(bestSubRec);
         console.log(bestSubSeq);
         var bestScore = countScore(bestSubRec, bestSubSeq, this.similarityMatrix);
-		return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest};
+		return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: rightOff};
 	}
+
+    this.reset = function() {
+        this.similarityMatrix = {};
+        this.record = [];
+        this.sequence = [];
+        this.word = {off: {sequence:0, record: 0}, size: 0, str: []};
+        this.maxScore = -1;
+        this.maxPenalty = -1;
+
+        //state
+        leftOff = {sequence: 0, record: 0};
+        rightOff = {sequence: 0, record: 0};
+        leftStop = false;
+        rightStop = false;
+        wordScore = 0;
+        expandRight = {score: [], penalty: []};
+        expandLeft = {score: [], penalty: []};
+    }
 
 	
 }
