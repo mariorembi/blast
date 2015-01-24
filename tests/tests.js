@@ -53,6 +53,28 @@ test('word splitting-size whole', function() {
     equal(words[0].off, 0, "Offset ok");
 })
 
+test('record hit', function() {
+    var word = 'AAA';
+    var record = 'AAAAAAA';
+
+    var result = wordRecordHit(record, word);
+    equal(result.length, record.length - word.length + 1);
+    for (var i = 0; i < result.length; i++) {
+        equal(result[i], i, "Record and word hit");
+    }
+})
+
+test('record hit 2', function() {
+    var word = 'ACAC';
+    var record = 'ACACACACACACAC';
+
+    var result = wordRecordHit(record, word);
+    equal(result.length, 6);
+    for (var i = 0; i < result.length; i++) {
+        equal(result[i], 2 * i, "Record and word hit");
+    }
+})
+
 test('database search', function() {
 	var word = 'AAAA';
 	var database = ['AAAATTTTAAAA', 'TTTTTTTTTTT', 'TTTTAAAATTTT'];
@@ -67,17 +89,16 @@ test('database search', function() {
 	equal(result[1].hits[0], 4, 'Offset of hit');
 })
 
-var test_expanding = function(sequence, record, expectedLeft, map, expectedRight, expectedResult) {
+var test_expanding = function(sequence, record, word, map, maxPenalty, maxScore, expectedLeft, expectedRight, expectedResult) {
     var expandTest = new Expander();
     ok(expandTest, 'Created Expander object');
-    expandTest.word = {off: {sequence: 3, record: 6}, size: 3, str: 'AAA'};
+    expandTest.word = word;
     expandTest.sequence = sequence;
     expandTest.record = record;
-    expandTest.maxPenalty = 2;
+    expandTest.maxPenalty = maxPenalty;
+    expandTest.maxScore = maxScore;
 
     expandTest.similarityMatrix = map;
-
-
 
     var initResult = expandTest.init();
     equal(initResult.left.score.length, 1, "Init score ok");
@@ -91,21 +112,30 @@ var test_expanding = function(sequence, record, expectedLeft, map, expectedRight
     var expectedLeftSize = 2;
     var expectedRightSize = 2;
     var stepResult = initResult;
+    var steps = 1;
     for (var i = 1; i < 10; i++) {
         if ((stepResult = expandTest.getNext()) == null)
             break;
         ok(stepResult != null, "Step result gathered");
-        equal(stepResult.left.score.length, expectedLeftSize, "Step incrementation ok");
-        equal(stepResult.right.score.length, expectedRightSize, "Step incrementation ok");
-        equal(stepResult.left.penalty[i], expectedLeft.penalty[i], "Step penalty ok");
-        equal(stepResult.left.score[i], expectedLeft.score[i], "Step score ok");
-        equal(stepResult.right.penalty[i], expectedRight.penalty[i], "Step penalty ok");
-        equal(stepResult.right.score[i], expectedRight.score[i], "Step score ok");
+        console.log(stepResult.left);
+        console.log(stepResult.right);
+        equal(stepResult.left.score.length, expectedLeftSize, "Step left incrementation ok");
+        equal(stepResult.right.score.length, expectedRightSize, "Step right incrementation ok");
+        if ( i < stepResult.left.score.length) {
+            console.log("i : " + i + "  length: " + stepResult.left.score.length);
+            equal(stepResult.left.penalty[i], expectedLeft.penalty[i], "Step left penalty ok");
+            equal(stepResult.left.score[i], expectedLeft.score[i], "Step left score ok");
+        }
+        if ( i < stepResult.right.score.length) {
+            equal(stepResult.right.penalty[i], expectedRight.penalty[i], "Step right penalty ok");
+            equal(stepResult.right.score[i], expectedRight.score[i], "Step right score ok");
+        }
         expectedLeftSize = Math.min(expectedLeftSize + 1, expectedLeft.score.length);
         expectedRightSize = Math.min(expectedRightSize + 1, expectedRight.score.length);
+        steps++;
     }
 
-    equal(i, Math.max(expectedLeft.score.length, expectedRight.score.length));
+    equal(steps, Math.max(expectedLeft.score.length, expectedRight.score.length));
     var result = expandTest.getResult();
     deepEqual(result, expectedResult, "Result ok");
 }
@@ -113,7 +143,8 @@ var test_expanding = function(sequence, record, expectedLeft, map, expectedRight
 test('expander-simple', function() {
 	var sequence = 'TTTAAATTT';
 	var record = 'GGGGGGAAAGGGGGG';
-    var expectedLeft = {score: [3,2,1], penalty: [0, 1, 2]};
+    var word = {off: {sequence: 3, record: 6}, size: 3, str: 'AAA'};
+    var expectedLeft = {score: [3,2,1], penalty: [0,1,2]};
     var expectedRight = expectedLeft;
     var expectedResult = {score: 3, sequenceOff: 3, recordOff: 6, size: 3};
 
@@ -124,6 +155,22 @@ test('expander-simple', function() {
         'T' : {'A' : -1, 'C' : -1, 'G' : -1, 'T' : 1}
     };
 
-    test_expanding(sequence, record, expectedLeft, map, expectedRight, expectedResult);
+    test_expanding(sequence, record, word, map, 2, -1, expectedLeft, expectedRight, expectedResult);
+})
 
+test('expander-simple2', function() {
+    var sequence = 'TTTTTGCGCAAAGGGGTTTTT';
+    var record = 'CCCCCGGGGAAACCCCCCCCC';
+    var word = {off: {sequence: 9, record: 9}, size: 3, str: 'AAA'};
+    var expectedLeft = {score: [3,2,3,2,3,2,1], penalty: [0,1,0,1,0,1,2]};
+    var expectedRight = {score: [3,2,1], penalty: [0,1,2]};
+    var expectedResult = {score: 3, sequenceOff: 5, recordOff: 5, size: 7};
+    var map = {
+        'A' : {'A' : 1, 'C' : -1, 'G' : -1, 'T' : -1},
+        'C' : {'A' : -1, 'C' : 1, 'G' : -1, 'T' : -1},
+        'G' : {'A' : -1, 'C' : -1, 'G' : 1, 'T' : -1},
+        'T' : {'A' : -1, 'C' : -1, 'G' : -1, 'T' : 1}
+    };
+
+    test_expanding(sequence, record, word, map, 2, -1, expectedLeft, expectedRight, expectedResult);
 })

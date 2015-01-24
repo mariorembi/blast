@@ -40,7 +40,7 @@ function wordRecordHit(record, word) {
 
 	while ((index = record.indexOf(word, off)) > -1) {
 		hits.push(index);
-		off = index + word.length;
+		off = index + 1;
 	}
 
 	return hits;
@@ -97,6 +97,7 @@ function Expander () {
 
         expandRight.score.push(wordScore);
         expandRight.penalty.push(0);
+        console.log("Expander left size: " + expandLeft.score.length);
         return {left: expandLeft, right: expandRight};
 	}
 	//public
@@ -104,7 +105,7 @@ function Expander () {
         console.log("Compare " + this.sequence[off.sequence] + " and " + this.record[off.record]);
         var score = this.similarityMatrix[this.sequence[off.sequence]][this.record[off.record]];
         var newScore = expansion.score[expansion.score.length - 1] + score;
-        expansion.score.push(newScore);
+
         var newPenalty = 0;
         if (score < 0) {
             newPenalty = expansion.penalty[expansion.penalty.length - 1] + Math.abs(score);
@@ -112,13 +113,15 @@ function Expander () {
             newPenalty = expansion.penalty[expansion.penalty.length - 1] - score;
         }
         newPenalty = Math.max(0, newPenalty);
-        expansion.penalty.push(newPenalty);
+
         if (this.maxPenalty != -1 && newPenalty > this.maxPenalty) {
             return true;
         }
         if (this.maxScore != -1 && newScore > this.maxScore) {
             return true;
         }
+        expansion.penalty.push(newPenalty);
+        expansion.score.push(newScore);
         console.log("New score: " + newScore + ", New penalty: " + newPenalty);
         return false;
 
@@ -171,7 +174,7 @@ function Expander () {
         var maxVal = 0;
         var maxInd;
         for (var i = 0; i < table.length; i++) {
-            if (table[i] > maxVal) {
+            if (table[i] >= maxVal) {
                 maxInd = i;
                 maxVal = table[i];
             }
@@ -185,15 +188,15 @@ function Expander () {
         var rightBest = getBest(expandRight.score);
         console.log("Left best: " + leftBest + " right best: " + rightBest);
         var leftOff = this.word.off.record - leftBest;
-        var rightOff = this.word.size + rightBest;
-        var bestSubRec = this.record.substr(leftOff, rightOff);
+        var size = this.word.off.record - leftOff + this.word.size + rightBest;
+        var bestSubRec = this.record.substr(leftOff, size);
+
         leftOff = this.word.off.sequence - leftBest;
-        rightOff = this.word.size + rightBest;
-        var bestSubSeq = this.sequence.substr(leftOff, rightOff);
+        var bestSubSeq = this.sequence.substr(leftOff, size);
         console.log(bestSubRec);
         console.log(bestSubSeq);
         var bestScore = countScore(bestSubRec, bestSubSeq, this.similarityMatrix);
-		return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: rightOff};
+		return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: size};
 	}
 
     this.reset = function() {
