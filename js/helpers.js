@@ -13,5 +13,8 @@ Ember.Handlebars.helper('make-offset', function(value, options){
 
 String.prototype.repeat = function(times) {
     times = times || 0;
+    if (times < 0) {
+        times = 0;
+    }
     return new Array(times + 1).join(this);
 };

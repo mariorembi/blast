@@ -2,15 +2,6 @@
  * Stworzenie globalnej definicji aplikacji
  */
 Blast = Ember.Application.create({
-    LOG_TRANSITIONS: true,
-    LOG_TRANSITIONS_INTERNAL: true,
-    ready: function () {
-        var store = this.__container__.lookup('store:main');
-        store.createRecord('sequenceRecord', {sequence: 'ATTTAGCAA'});
-        store.createRecord('sequenceRecord', {sequence: 'AGACCATTA'});
-        store.createRecord('sequenceRecord', {sequence: 'GATTACAAG'});
-        return this;
-    }
 });
 
 Blast.Router.map(function () {
@@ -25,7 +16,7 @@ Blast.Router.map(function () {
 Blast.ApplicationAdapter = DS.FixtureAdapter.extend();
 
 Blast.ApplicationController = Ember.ObjectController.extend({
-    wordLength: 4,
+    wordLength: 11,
     scoreDropOff: 5,
     stages: [
         Ember.Object.create({

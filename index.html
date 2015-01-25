@@ -41,7 +41,7 @@
 </script>
 
 <script type="text/x-handlebars" id="configuration">
-    <div class="form-horizontal col-md-5">
+    <div class="form-horizontal col-md-7">
         <div class="form-group">
             <label class="col-sm-3 control-label">Query sequence</label>
             <div class="col-sm-9">
@@ -65,7 +65,7 @@
             <div class="col-sm-9">
                 <ul class="list-group">
                     {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<div class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></div></li>
+                    <li class="list-group-item">{{record.sequence}}<span class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></span></li>
                     {{else}}
                     <comment>There is no database records</comment>
                     {{/each}}
