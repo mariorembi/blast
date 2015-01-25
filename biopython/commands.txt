@@ -1,0 +1,2 @@
+makeblastdb -in fixtures_database.fasta -out fixtures_database -dbtype nucl
+blastn -query fixtures_query.fasta -db fixtures_database -penalty -1 -reward 1 -ungapped -task blastn-short
