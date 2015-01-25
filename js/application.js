@@ -447,6 +447,8 @@ Blast.ExtendController = Ember.ObjectController.extend({
                     match.set('queryEndOffset', wordGroup.get('word.startOffset') + wordGroup.get('word.symbols.length'));
                 });
             });
+            this._expander.resetStage();
+            this.store.unloadAll('result');
             this.set('stageCompleted', false);
             this.get('controllers.application.stages').findBy('resource', 'results').set('disabled', true);
         },
