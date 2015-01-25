@@ -269,6 +269,7 @@ Drop off score: {{dropOffView}}
 </script>
 
 <script type="text/x-handlebars" id="components/result-item">
+    {{#if result.score}}<span class="score">Score: {{result.score}}</span>{{/if}}
     {{prefix}}{{highlight match}}{{suffix}}
     {{#if result.record.description}}
     <comment>{{result.record.description}}</comment>

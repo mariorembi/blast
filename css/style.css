@@ -27,3 +27,7 @@ th {
 pre {
     word-wrap: normal;
 }
+
+.score {
+    margin-right: 10px;
+}
