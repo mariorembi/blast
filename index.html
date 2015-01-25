@@ -173,7 +173,34 @@
 </script>
 
 <script type="text/x-handlebars" id="about">
-    This Web application presents BLAST algorithm for DNA sequences matching...
+    <h3>Description</h3>
+    This Web application presents BLAST (Basic Local Aligment Search Tool) heuristics algorithm design mainly for comparing nucleotids of DNA sequences. <br>
+    It provides inbuilt examples of possible query sequences and simple small database. <br>
+    A BLAST search enables a researcher to compare a query sequence with a library or database of sequences, <br>
+    and identify library sequences that resemble the query sequence above a certain threshold. <br>
+    <h3>Stages</h3>
+    To enhance visualization of presented algorithm the computing is divided into five stages. Each one presents important part of heuristics.
+    <ul>
+        <li><b>Configuration</b></li>
+        This stage allows user to pass input sequence query, edit the database or similarity matrix and set parameters of heuristic. <br>
+        <i>Next stage</i>: Moves to initialization stage.
+        <li><b>Initialization Stage</b></li>
+        In this part the query sequence is being sliced into fragments of given length. These will be used to query the database. <br>
+        <i>Next step</i>: Shows next fragment of sequence starting from beginning of sequence. <br>
+        <i>Next stage</i>: Pressed first time shows all generated fragments of sequence. After this moves to Searching Stage.
+        <li><b>Searching stage</b></li>
+        Searching is performed on every fragment of given query sequence and every database record. Only strict matches are passed to next stages.<br>
+        <i>Next step</i> Processes another pair of fragment and record. If match was found, displays it under matches section.
+        <i>Next stage</i> Pressed once shows all matches for sequence fragment and database record. Pressed second time moves to Extend Stage.
+        <li><b>Extend Stage</b></li>
+        Every pair - fragment and database record is an input to extending algorithm. The extending algorithm compares each character of<br>
+        fragment and record and computes total score and penalty drop off. <br>
+        <i>Next step</i> Shows one step of sequence and record character computing. When computing stops, shows the best match.<br>
+        <i>Next stage</i> Shows end of computing for each sequence and record. Pressed again moves to Results.
+        <li><b>Results</b></li>
+        In this stage all records with matches are shown with best match highlighted. They are ordered from best score to lowest.
+    </ul>
+
 </script>
 
 <script type="text/x-handlebars" id="components/scoring-matrix">
