@@ -343,7 +343,7 @@ Blast.ExtendController = Ember.ObjectController.extend({
                 return match.get('extended');
             });
         });
-    }.property('wordGroups'),
+    }.property('wordGroups').volatile(),
     _performNextStep: function (forAll) {
         var matchedRecord = undefined;
         var wordGroupRef = this.get('wordGroups').find(function (wordGroup) {
@@ -389,13 +389,10 @@ Blast.ExtendController = Ember.ObjectController.extend({
                     this._processStepResult(matchedRecord, results);
                     this._updateMatchRanges(matchedRecord);
                 } else {
-                    matchedRecord.set('extended', true);
-                    matchedRecord.set('active', false);
                     this._processBestMatchResult(matchedRecord, this._expander.getResult());
                 }
             }
         }
-        this.set('stageCompleted', this.stageCompleted());
     },
     _processStepResult: function (matchRecord, results) {
         matchRecord.set('leftExtension.scores', results.left.score);
@@ -412,6 +409,8 @@ Blast.ExtendController = Ember.ObjectController.extend({
     },
     _processBestMatchResult: function (matchRecord, result) {
         this._updateMatchRanges(matchRecord);
+        matchRecord.set('extended', true);
+        matchRecord.set('active', false);
         this.get('store').createRecord('result', {
             record: matchRecord.get('record'),
             startOffset: result.recordOff,
