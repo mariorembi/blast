@@ -188,7 +188,7 @@ function Expander() {
         var rightBest = getBest(expandRight.score);
         console.log("Left best: " + leftBest + " right best: " + rightBest);
         var left = this.word.off.record - leftBest;
-        var size = this.word.off.record - leftOff + this.word.size + rightBest;
+        var size = this.word.off.record - left + this.word.size + rightBest;
         var bestSubRec = this.record.substr(left, size);
 
         left = this.word.off.sequence - leftBest;
@@ -196,7 +196,7 @@ function Expander() {
         console.log(bestSubRec);
         console.log(bestSubSeq);
         var bestScore = countScore(bestSubRec, bestSubSeq, this.similarityMatrix);
-        return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: size};
+        return {score: bestScore, sequenceOff: left, recordOff: this.word.off.record - leftBest, size: size};
     };
 
     this.resetState = function () {
