@@ -45,8 +45,8 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
     }.property('record.active'),
     sequencePrefixView: function () {
         var diff = this.get('record.queryStartOffset') - this.get('record.matchStartOffset');
-        var blankPrefix = diff > 0 ? '   '.repeat(diff) : '';
-        return blankPrefix + (this.get('record.record.sequence').substr(0, this.get('record.matchStartOffset'))).scatter();
+        var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
+        return (blankPrefix + this.get('record.record.sequence').substr(0, this.get('record.matchStartOffset'))).scatter();
     }.property('record.record.sequence', 'record.matchStartOffset', 'record.queryStartOffset'),
     sequenceMatchView: function () {
         return (this.get('record.record.sequence').substring(this.get('record.matchStartOffset'), this.get('record.matchEndOffset'))).scatter();
@@ -57,7 +57,7 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
     queryPrefixView: function () {
         var diff = this.get('record.matchStartOffset') - this.get('record.queryStartOffset');
         var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
-        return blankPrefix + (this.get('word.originalSequence.sequence').substring(0, this.get('record.queryStartOffset'))).scatter();
+        return (blankPrefix + this.get('word.originalSequence.sequence').substring(0, this.get('record.queryStartOffset'))).scatter();
     }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.matchStartOffset'),
     queryMatchView: function () {
         return (this.get('word.originalSequence.sequence').substring(this.get('record.queryStartOffset'), this.get('record.queryEndOffset'))).scatter();
@@ -71,10 +71,10 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         };
         var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         var leftScore = this.get('record.leftExtension.scores');
-        scoreStr += leftScore.reverse().map(callback).join('');
+        scoreStr += leftScore.map(callback).join('');
         var rightScore = this.get('record.rightExtension.scores');
         //FIXME blank space between scores
-        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftScore.length - rightScore.length);
+        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftScore.length - rightScore.length).scatter();
         scoreStr += rightScore.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.scores', 'record.rightExtension.scores', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset'),
@@ -85,9 +85,9 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         var leftDropOff = this.get('record.leftExtension.dropOffs');
         var rightDropOff = this.get('record.rightExtension.dropOffs');
-        scoreStr += leftDropOff.reverse().map(callback).join('');
+        scoreStr += leftDropOff.map(callback).join('');
         //FIXME blank space between drop-offs
-        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftDropOff.length - rightDropOff.length);
+        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftDropOff.length - rightDropOff.length).scatter();
         scoreStr += rightDropOff.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.dropOffs', 'record.rightExtension.dropOffs', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset')

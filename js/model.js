@@ -25,7 +25,8 @@ Blast.Word = DS.Model.extend({
  * Definicja encji definiującej rekord "bazy danych" zawierającej sekwencje DNA
  */
 Blast.SequenceRecord = DS.Model.extend({
-    sequence: DS.attr('string')
+    sequence: DS.attr('string'),
+    description: DS.attr('string')
 });
 
 /**

@@ -94,12 +94,17 @@ Blast.ConfigurationRoute = Ember.Route.extend({
 Blast.ConfigurationController = Ember.ObjectController.extend({
     needs: ['application'],
     newSequenceRecord: '',
+    disabled: false,
+    enabled: function() {
+        return !this.get('disabled');
+    }.property('disabled'),
     actions: {
         prevStage: Ember.K,
         resetStage: Ember.K,
         nextStep: Ember.K,
         nextStage: function () {
             //FIXME validate configuration
+            this.set('disabled', true);
             this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
             this.transitionToRoute('init');
         },
@@ -115,6 +120,18 @@ Blast.ConfigurationController = Ember.ObjectController.extend({
         removeAllRecords: function () {
             this.store.unloadAll('sequenceRecord');
             return false;
+        },
+        editConfiguration: function () {
+            this.store.unloadAll('result');
+            this.store.unloadAll('extension');
+            this.store.unloadAll('matchedRecord');
+            this.store.unloadAll('wordRecordGroup');
+            this.store.unloadAll('word');
+            this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', true);
+            this.get('controllers.application.stages').findBy('resource', 'search').set('disabled', true);
+            this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', true);
+            this.get('controllers.application.stages').findBy('resource', 'results').set('disabled', true);
+            this.set('disabled', false);
         }
     }
 });
@@ -294,7 +311,8 @@ Blast.ExtendRoute = Ember.Route.extend({
         return {
             symbols: this.store.findAll('sequenceSymbol'),
             scoring: this.store.findAll('scoring'),
-            wordGroups: this.store.findAll('wordRecordGroup')
+            wordGroups: this.store.findAll('wordRecordGroup'),
+            results: this.store.findAll('result')
         };
     },
     setupController: function (controller, model) {
@@ -402,12 +420,13 @@ Blast.ExtendController = Ember.ObjectController.extend({
         this._updateMatchRanges(matchRecord);
         matchRecord.set('extended', true);
         matchRecord.set('active', false);
-        this.get('store').createRecord('result', {
+        var newResult = {
             record: matchRecord.get('record'),
             startOffset: result.recordOff,
             endOffset: result.recordOff + result.size,
             score: result.score
-        });
+        };
+        this.get('store').createRecord('result', newResult);
     },
     actions: {
         prevStage: function () {
@@ -415,7 +434,7 @@ Blast.ExtendController = Ember.ObjectController.extend({
         },
         resetStage: function () {
             this.get('wordGroups').forEach(function (wordGroup) {
-                wordGroup.get('matchedRecords').every(function (match) {
+                wordGroup.get('matchedRecords').forEach(function (match) {
                     match.set('active', false);
                     match.set('extended', false);
                     match.set('leftExtension.scores', []);

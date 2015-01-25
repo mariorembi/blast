@@ -42,22 +42,30 @@
 
 <script type="text/x-handlebars" id="configuration">
     <div class="form-horizontal col-md-7">
+        {{#if disabled}}
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Modify configuration</label>
+            <div class="col-sm-9">
+                <button {{action 'editConfiguration'}} class="btn btn-default">Edit</button>
+            </div>
+        </div>
+        {{/if}}
         <div class="form-group">
             <label class="col-sm-3 control-label">Query sequence</label>
             <div class="col-sm-9">
-                {{input value=query.sequence placeholder="Type a DNA sequence" required=true class="form-control"}}
+                {{input value=query.sequence placeholder="Type a DNA sequence" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">Word length</label>
             <div class="col-sm-3">
-                {{input value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control"}}
+                {{input value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">Score drop off</label>
             <div class="col-sm-3">
-                {{input value=controllers.application.scoreDropOff size=4 placeholder="Set minimal scoring threshold" required=true class="form-control"}}
+                {{input value=controllers.application.scoreDropOff size=4 placeholder="Set minimal scoring threshold" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
         <div class="form-group">
@@ -65,16 +73,16 @@
             <div class="col-sm-9">
                 <ul class="list-group">
                     {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}<span class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></span></li>
+                    <li class="list-group-item">{{record.sequence}}{{#if enabled}}<span class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></span>{{/if}}</li>
                     {{else}}
                     <comment>There is no database records</comment>
                     {{/each}}
                 </ul>
-                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control"}}
+                {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control" disabled=disabled}}
                 <br/>
                 <div class="btn-group">
-                    <button {{action 'addRecordSequence'}} class="btn btn-primary">Add record</button>
-                    <button {{action 'removeAllRecords'}} class="btn btn-danger">Remove all records</button>
+                    <button {{action 'addRecordSequence' disabled=disabled}} class="btn btn-primary">Add record</button>
+                    <button {{action 'removeAllRecords' disabled=disabled}} class="btn btn-danger">Remove all records</button>
                 </div>
             </div>
         </div>
@@ -82,7 +90,7 @@
     <div class="form-horizontal col-md-5">
         <div class="form-group">
             <label class="col-sm-3 control-label">Scoring matrix</label>
-            {{scoring-matrix symbols=symbols scoring=scoring disabled=false class="col-sm-9"}}
+            {{scoring-matrix symbols=symbols scoring=scoring disabled=disabled class="col-sm-9"}}
         </div>
     </div>
 </script>
@@ -235,6 +243,9 @@ Drop off score: {{dropOffView}}
 
 <script type="text/x-handlebars" id="components/result-item">
     {{prefix}}{{highlight match}}{{suffix}}
+    {{#if result.record.description}}
+    <comment>{{result.record.description}}</comment>
+    {{/if}}
 </script>
 
 <script type="text/javascript" src="js/ext/jquery-1.10.2.js"></script>
