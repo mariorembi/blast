@@ -45,44 +45,50 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
     }.property('record.active'),
     sequencePrefixView: function () {
         var diff = this.get('record.queryStartOffset') - this.get('record.matchStartOffset');
-        var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
-        return blankPrefix + this.get('record.record.sequence').substr(0, this.get('record.matchStartOffset'));
+        var blankPrefix = diff > 0 ? '   '.repeat(diff) : '';
+        return blankPrefix + (this.get('record.record.sequence').substr(0, this.get('record.matchStartOffset'))).scatter();
     }.property('record.record.sequence', 'record.matchStartOffset', 'record.queryStartOffset'),
     sequenceMatchView: function () {
-        return this.get('record.record.sequence').substring(this.get('record.matchStartOffset'), this.get('record.matchEndOffset'));
+        return (this.get('record.record.sequence').substring(this.get('record.matchStartOffset'), this.get('record.matchEndOffset'))).scatter();
     }.property('record.record.sequence', 'record.matchStartOffset', 'record.matchEndOffset'),
     sequenceSuffixView: function () {
-        return this.get('record.record.sequence').substring(this.get('record.matchStartOffset') + this.get('record.matchEndOffset'));
+        return (this.get('record.record.sequence').substring(this.get('record.matchStartOffset') + this.get('record.matchEndOffset'))).scatter();
     }.property('record.record.sequence', 'record.matchStartOffset', 'record.matchEndOffset'),
     queryPrefixView: function () {
         var diff = this.get('record.matchStartOffset') - this.get('record.queryStartOffset');
         var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
-        return blankPrefix + this.get('word.originalSequence.sequence').substring(0, this.get('record.queryStartOffset'));
+        return blankPrefix + (this.get('word.originalSequence.sequence').substring(0, this.get('record.queryStartOffset'))).scatter();
     }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.matchStartOffset'),
     queryMatchView: function () {
-        return this.get('word.originalSequence.sequence').substring(this.get('record.queryStartOffset'), this.get('record.queryEndOffset'));
+        return (this.get('word.originalSequence.sequence').substring(this.get('record.queryStartOffset'), this.get('record.queryEndOffset'))).scatter();
     }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.queryEndOffset'),
     querySuffixView: function () {
-        return this.get('word.originalSequence.sequence').substring(this.get('record.queryStartOffset') + this.get('record.queryEndOffset'));
+        return (this.get('word.originalSequence.sequence').substring(this.get('record.queryStartOffset') + this.get('record.queryEndOffset'))).scatter();
     }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.queryEndOffset'),
     scoreView: function () {
-        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')));
+        var callback = function (number) {
+            return number.asScatteredString();
+        };
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         var leftScore = this.get('record.leftExtension.scores');
-        scoreStr += leftScore.reverse().join('');
+        scoreStr += leftScore.reverse().map(callback).join('');
         var rightScore = this.get('record.rightExtension.scores');
         //FIXME blank space between scores
         scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftScore.length - rightScore.length);
-        scoreStr += rightScore.join('');
+        scoreStr += rightScore.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.scores', 'record.rightExtension.scores', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset'),
     dropOffView: function () {
-        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')));
+        var callback = function (number) {
+            return number.asScatteredString();
+        };
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         var leftDropOff = this.get('record.leftExtension.dropOffs');
         var rightDropOff = this.get('record.rightExtension.dropOffs');
-        scoreStr += leftDropOff.reverse().join('');
+        scoreStr += leftDropOff.reverse().map(callback).join('');
         //FIXME blank space between drop-offs
         scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftDropOff.length - rightDropOff.length);
-        scoreStr += rightDropOff.join('');
+        scoreStr += rightDropOff.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.dropOffs', 'record.rightExtension.dropOffs', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset')
 });

@@ -18,3 +18,18 @@ String.prototype.repeat = function(times) {
     }
     return new Array(times + 1).join(this);
 };
+
+String.prototype.scatter = function() {
+    var newString = '';
+    for (var i = 0; i < this.length; ++i) {
+        var at = this.charAt(i);
+        newString += '  ' + at;
+    }
+    return newString;
+};
+
+Number.prototype.asScatteredString = function() {
+    var asString = '' + this;
+    var size = 3 - asString.length;
+    return size > 0 ? ' '.repeat(size) + asString : asString;
+};
