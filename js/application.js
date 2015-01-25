@@ -315,7 +315,7 @@ Blast.ExtendRoute = Ember.Route.extend({
         appController.set('nextStageButtonDisabled', false);
         appController.set('outletController', controller);
         var map = {};
-        model.scoring.then(function(scoring){
+        model.scoring.then(function (scoring) {
             scoring.forEach(function (scoreEntry) {
                 var from = scoreEntry.get('fromSymbol.symbol');
                 var to = scoreEntry.get('toSymbol.symbol');
@@ -468,7 +468,11 @@ Blast.ResultsRoute = Ember.Route.extend({
         return {
             query: this.store.find('querySequence', '1'),
             records: this.store.findAll('sequenceRecord'),
-            results: this.store.findAll('result')
+            results: DS.PromiseArray.create({
+                promise: this.store.findAll('result').then(function (results) {
+                    return results.sortBy('score').reverse()
+                })
+            })
         };
     },
     setupController: function (controller, model) {
