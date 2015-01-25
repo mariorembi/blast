@@ -121,20 +121,22 @@
             {{scoring-matrix symbols=symbols scoring=scoring disabled=true class="col-sm-9"}}
         </div>
     {{#each wordGroup in wordGroups}}
+        {{#if wordGroup.matchedRecords}}
         <div class="form-group">
             <label class="col-sm-1 control-label">Word</label>
             <div class="col-sm-1">
-                {{input value=wordGroup.word disabled=true class="form-control"}}
+                {{input value=wordGroup.word.symbols disabled=true class="form-control"}}
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-1 control-label">Matched records</label>
             <div class="col-sm-11">
-                {{#each record in wordGroup.records}}
-                {{record-extension record=record}}
+                {{#each record in wordGroup.matchedRecords}}
+                {{record-extension record=record word=wordGroup.word}}
                 {{/each}}
             </div>
         </div>
+        {{/if}}
     {{/each}}
     </div>
 </script>

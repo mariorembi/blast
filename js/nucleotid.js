@@ -34,64 +34,64 @@ function wordSplit(sequence, wordSize) {
 }
 
 function wordRecordHit(record, word) {
-	var hits = [];
-	var off = 0;
-	var ind;
+    var hits = [];
+    var off = 0;
+    var ind;
 
-	while ((index = record.indexOf(word, off)) > -1) {
-		hits.push(index);
-		off = index + 1;
-	}
+    while ((index = record.indexOf(word, off)) > -1) {
+        hits.push(index);
+        off = index + 1;
+    }
 
-	return hits;
+    return hits;
 }
 
 function wordDBHits(database, word) {
-	var hits = [];
-	for (var id = 0; id < database.length; id++) {
-		var hitsPerRecord = wordRecordHit(database[id], word);
-		if (hitsPerRecord.length > 0) {
-			hits.pushObject({id: id, hits: hitsPerRecord});
-		}
-	}
-	return hits;
+    var hits = [];
+    for (var id = 0; id < database.length; id++) {
+        var hitsPerRecord = wordRecordHit(database[id], word);
+        if (hitsPerRecord.length > 0) {
+            hits.pushObject({id: id, hits: hitsPerRecord});
+        }
+    }
+    return hits;
 }
 
 function countScore(a, b, similarityMatrix) {
-	if (a.length != b.length)
-		return 0;
-	var score = 0;
-	for (var i = 0; i < a.length; i++) {
-		score += similarityMatrix[a[i]][b[i]];
-	}
-	return score;
+    if (a.length != b.length)
+        return 0;
+    var score = 0;
+    for (var i = 0; i < a.length; i++) {
+        score += similarityMatrix[a[i]][b[i]];
+    }
+    return score;
 }
 
-function Expander () {
-	this.similarityMatrix = {};
-	this.record = [];
-	this.sequence = [];
-	this.word = {off: {sequence:0, record: 0}, size: 0, str: []};
-	this.maxScore = -1;
-	this.maxPenalty = -1;
-	
-	//state
-	var leftOff = {sequence: 0, record: 0};
-	var rightOff = {sequence: 0, record: 0};
-	var leftStop = false;
-	var rightStop = false;
-	var wordScore = 0;
-	
-	var expandRight = {score: [], penalty: []};
-	var expandLeft = {score: [], penalty: []};
-	
-	this.init = function() {
-		leftOff.sequence = this.word.off.sequence;
+function Expander() {
+    this.similarityMatrix = {};
+    this.record = [];
+    this.sequence = [];
+    this.word = {off: {sequence: 0, record: 0}, size: 0, str: []};
+    this.maxScore = -1;
+    this.maxPenalty = -1;
+
+    //state
+    var leftOff = {sequence: 0, record: 0};
+    var rightOff = {sequence: 0, record: 0};
+    var leftStop = false;
+    var rightStop = false;
+    var wordScore = 0;
+
+    var expandRight = {score: [], penalty: []};
+    var expandLeft = {score: [], penalty: []};
+
+    this.init = function () {
+        leftOff.sequence = this.word.off.sequence;
         leftOff.record = this.word.off.record;
-		rightOff.sequence = this.word.off.sequence + this.word.size - 1;
-        rightOff.record = this.word.off.record  + this.word.size - 1;
-		
-		wordScore = countScore(this.word.str, this.word.str, this.similarityMatrix);
+        rightOff.sequence = this.word.off.sequence + this.word.size - 1;
+        rightOff.record = this.word.off.record + this.word.size - 1;
+
+        wordScore = countScore(this.word.str, this.word.str, this.similarityMatrix);
         expandLeft.score.push(wordScore);
         expandLeft.penalty.push(0);
 
@@ -99,9 +99,9 @@ function Expander () {
         expandRight.penalty.push(0);
         console.log("Expander left size: " + expandLeft.score.length);
         return {left: expandLeft, right: expandRight};
-	}
-	//public
-    this.updateExpansion = function(expansion, off) {
+    };
+    //public
+    this.updateExpansion = function (expansion, off) {
         console.log("Compare " + this.sequence[off.sequence] + " and " + this.record[off.record]);
         var score = this.similarityMatrix[this.sequence[off.sequence]][this.record[off.record]];
         var newScore = expansion.score[expansion.score.length - 1] + score;
@@ -125,17 +125,17 @@ function Expander () {
         console.log("New score: " + newScore + ", New penalty: " + newPenalty);
         return false;
 
-    }
-    this.getNext = function() {
+    };
+    this.getNext = function () {
         console.log("Left off sequence: " + leftOff.sequence + " record: " + leftOff.record);
         console.log("Right off sequence: " + rightOff.sequence + " record: " + rightOff.record);
         if (!leftStop) {
             leftOff.sequence--;
             leftOff.record--;
-            if (leftOff.sequence < 0 ) {
+            if (leftOff.sequence < 0) {
                 leftStop = true;
                 leftOff.sequence++;
-            } else if (leftOff.record < 0){
+            } else if (leftOff.record < 0) {
                 leftStop = true;
                 leftOff.record++;
             } else {
@@ -163,14 +163,14 @@ function Expander () {
         console.log(expandLeft.penalty);
         console.log(expandRight.score);
         console.log(expandRight.penalty);
-		return {left: expandLeft, right: expandRight};
-	}
-
-	this.getAll = function() {
-		while (this.getNext() != null) ;
         return {left: expandLeft, right: expandRight};
-	}
-    var getBest = function(table) {
+    };
+
+    this.getAll = function () {
+        while (this.getNext() != null) ;
+        return {left: expandLeft, right: expandRight};
+    };
+    var getBest = function (table) {
         var maxVal = 0;
         var maxInd;
         for (var i = 0; i < table.length; i++) {
@@ -180,8 +180,8 @@ function Expander () {
             }
         }
         return maxInd;
-    }
-	this.getResult = function() {
+    };
+    this.getResult = function () {
         if (!leftStop && !rightStop)
             return null;
         var leftBest = getBest(expandLeft.score);
@@ -196,18 +196,10 @@ function Expander () {
         console.log(bestSubRec);
         console.log(bestSubSeq);
         var bestScore = countScore(bestSubRec, bestSubSeq, this.similarityMatrix);
-		return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: size};
-	}
+        return {score: bestScore, sequenceOff: leftOff, recordOff: this.word.off.record - leftBest, size: size};
+    };
 
-    this.reset = function() {
-        this.similarityMatrix = {};
-        this.record = [];
-        this.sequence = [];
-        this.word = {off: {sequence:0, record: 0}, size: 0, str: []};
-        this.maxScore = -1;
-        this.maxPenalty = -1;
-
-        //state
+    this.resetState = function () {
         leftOff = {sequence: 0, record: 0};
         rightOff = {sequence: 0, record: 0};
         leftStop = false;
@@ -215,9 +207,21 @@ function Expander () {
         wordScore = 0;
         expandRight = {score: [], penalty: []};
         expandLeft = {score: [], penalty: []};
+    };
+
+    this.reset = function () {
+        this.similarityMatrix = {};
+        this.record = [];
+        this.sequence = [];
+        this.word = {off: {sequence: 0, record: 0}, size: 0, str: []};
+        this.maxScore = -1;
+        this.maxPenalty = -1;
+
+        //state
+        this.resetState();
     }
 
-	
+
 }
 
 

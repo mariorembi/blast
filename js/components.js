@@ -44,47 +44,47 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         return this.get('record.active');
     }.property('record.active'),
     sequencePrefixView: function () {
-        var diff = this.get('record.queryRange.from') - this.get('record.sequenceRange.from');
+        var diff = this.get('record.queryStartOffset') - this.get('record.matchStartOffset');
         var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
-        return blankPrefix + this.get('record.sequence').substr(0, this.get('record.sequenceRange.from'));
-    }.property('record.sequence', 'record.sequenceRange.from', 'record.queryRange.from'),
+        return blankPrefix + this.get('record.record.sequence').substr(0, this.get('record.matchStartOffset'));
+    }.property('record.record.sequence', 'record.matchStartOffset', 'record.queryStartOffset'),
     sequenceMatchView: function () {
-        return this.get('record.sequence').substr(this.get('record.sequenceRange.from'), this.get('record.sequenceRange.length'));
-    }.property('record.sequence', 'record.sequenceRange.from', 'record.sequenceRange.length'),
+        return this.get('record.record.sequence').substring(this.get('record.matchStartOffset'), this.get('record.matchEndOffset'));
+    }.property('record.record.sequence', 'record.matchStartOffset', 'record.matchEndOffset'),
     sequenceSuffixView: function () {
-        return this.get('record.sequence').substr(this.get('record.sequenceRange.from') + this.get('record.sequenceRange.length'));
-    }.property('record.sequence', 'record.sequenceRange.from', 'record.sequenceRange.length'),
+        return this.get('record.record.sequence').substring(this.get('record.matchStartOffset') + this.get('record.matchEndOffset'));
+    }.property('record.record.sequence', 'record.matchStartOffset', 'record.matchEndOffset'),
     queryPrefixView: function () {
-        var diff = this.get('record.sequenceRange.from') - this.get('record.queryRange.from');
+        var diff = this.get('record.matchStartOffset') - this.get('record.queryStartOffset');
         var blankPrefix = diff > 0 ? ' '.repeat(diff) : '';
-        return blankPrefix + this.get('record.query').substr(0, this.get('record.queryRange.from'));
-    }.property('record.query', 'record.queryRange.from', 'record.sequenceRange.from'),
+        return blankPrefix + this.get('word.originalSequence.sequence').substr(0, this.get('record.queryStartOffset'));
+    }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.matchStartOffset'),
     queryMatchView: function () {
-        return this.get('record.query').substr(this.get('record.queryRange.from'), this.get('record.queryRange.length'));
-    }.property('record.query', 'record.queryRange.from', 'record.queryRange.length'),
+        return this.get('word.originalSequence.sequence').substr(this.get('record.queryStartOffset'), this.get('record.queryEndOffset'));
+    }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.queryEndOffset'),
     querySuffixView: function () {
-        return this.get('record.query').substr(this.get('record.queryRange.from') + this.get('record.queryRange.length'));
-    }.property('record.query', 'record.queryRange.from', 'record.queryRange.length'),
+        return this.get('word.originalSequence.sequence').substr(this.get('record.queryStartOffset') + this.get('record.queryEndOffset'));
+    }.property('word.originalSequence.sequence', 'record.queryStartOffset', 'record.queryEndOffset'),
     scoreView: function () {
-        var scoreStr = ' '.repeat(Math.max(this.get('record.sequenceRange.from'), this.get('record.queryRange.from')));
-        var leftScore = this.get('record.leftExtension.score');
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')));
+        var leftScore = this.get('record.leftExtension.scores');
         scoreStr += leftScore.reverse().join('');
-        var rightScore = this.get('record.rightExtension.score');
+        var rightScore = this.get('record.rightExtension.scores');
         //FIXME blank space between scores
-        scoreStr += ' '.repeat(this.get('record.queryRange.length') - leftScore.length - rightScore.length);
+        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - leftScore.length - rightScore.length);
         scoreStr += rightScore.join('');
         return scoreStr;
-    }.property('record.leftExtension.score', 'record.rightExtension.score', 'record.sequenceRange.from', 'record.queryRange.from', 'record.queryRange.length'),
+    }.property('record.leftExtension.scores', 'record.rightExtension.scores', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset'),
     dropOffView: function () {
-        var scoreStr = ' '.repeat(Math.max(this.get('record.sequenceRange.from'), this.get('record.queryRange.from')));
-        var leftDropOff = this.get('record.leftExtension.dropOff');
-        var rightDropOff = this.get('record.rightExtension.dropOff');
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')));
+        var leftDropOff = this.get('record.leftExtension.dropOffs');
+        var rightDropOff = this.get('record.rightExtension.dropOffs');
         scoreStr += leftDropOff.reverse().join('');
         //FIXME blank space between drop-offs
-        scoreStr += ' '.repeat(this.get('record.queryRange.length') - leftDropOff.length - rightDropOff.length);
+        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - leftDropOff.length - rightDropOff.length);
         scoreStr += rightDropOff.join('');
         return scoreStr;
-    }.property('record.leftExtension.dropOff', 'record.rightExtension.dropOff', 'record.sequenceRange.from', 'record.queryRange.from', 'record.queryRange.length')
+    }.property('record.leftExtension.dropOffs', 'record.rightExtension.dropOffs', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset')
 });
 
 Blast.ResultItemComponent = Ember.Component.extend({

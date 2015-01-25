@@ -41,7 +41,7 @@ Blast.ApplicationController = Ember.ObjectController.extend({
         Ember.Object.create({
             name: 'Extend Stage',
             resource: 'extend',
-            disabled: false
+            disabled: true
         }),
         Ember.Object.create({
             name: 'Results',
@@ -108,7 +108,7 @@ Blast.ConfigurationController = Ember.ObjectController.extend({
         resetStage: Ember.K,
         nextStep: Ember.K,
         nextStage: function () {
-            //TODO validate configuration, update querySequence
+            //FIXME validate configuration
             this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
             this.transitionToRoute('init');
         },
@@ -154,13 +154,13 @@ Blast.InitRoute = Ember.Route.extend({
 
 Blast.InitController = Ember.ObjectController.extend({
     needs: ['application'],
-    stageCompleted: function() {
+    stageCompleted: function () {
         return this.get('words.length') > 0;
     }.property('words'),
-    _performNextStep: function() {
+    _performNextStep: function () {
         var query = this.get('query');
         var self = this;
-        wordSplit(query.get('sequence'), this.get('controllers.application.wordLength')).forEach(function(wordDescriptor){
+        wordSplit(query.get('sequence'), this.get('controllers.application.wordLength')).forEach(function (wordDescriptor) {
             var store = self.get('store');
             var word = store.createRecord('word', {
                 startOffset: wordDescriptor.off,
@@ -182,13 +182,13 @@ Blast.InitController = Ember.ObjectController.extend({
             this.get('controllers.application.stages').findBy('resource', 'search').set('disabled', true);
         },
         nextStep: function () {
-            if(!this.get('stageCompleted')) {
+            if (!this.get('stageCompleted')) {
                 this._performNextStep();
             }
         },
         nextStage: function () {
             if (!this.get('stageCompleted')) {
-                while(!this.get('stageCompleted')) {
+                while (!this.get('stageCompleted')) {
                     this._performNextStep();
                 }
                 return;
@@ -224,26 +224,38 @@ Blast.SearchRoute = Ember.Route.extend({
 
 Blast.SearchController = Ember.ObjectController.extend({
     needs: ['application'],
-    stageCompleted: function() {
-        return this.get('wordRecordGroups').find(function(wordRecordGroup){
-            return wordRecordGroup.get('recordsToCheck.length') > 0;
-        }) === undefined;
+    stageCompleted: function () {
+        return this.get('wordRecordGroups').find(function (wordRecordGroup) {
+                return wordRecordGroup.get('recordsToCheck.length') > 0;
+            }) === undefined;
     }.property('wordRecordGroups'),
-    _performNextStep: function() {
+    _performNextStep: function () {
         var query = this.get('query');
         var self = this;
-        var currentWordRecordGroup = this.get('wordRecordGroups').find(function(wordRecordGroup){
+        var currentWordRecordGroup = this.get('wordRecordGroups').find(function (wordRecordGroup) {
             return wordRecordGroup.get('recordsToCheck.length') > 0;
         });
         if (currentWordRecordGroup !== undefined) {
             var record = currentWordRecordGroup.get('recordsToCheck').shiftObject();
             var recordSequence = record.get('sequence');
-            var word = currentWordRecordGroup.get('word.symbols');
+            var word = currentWordRecordGroup.get('word');
+            var wordSymbols = word.get('symbols');
+            var wordStartOffset = word.get('startOffset');
             var store = self.get('store');
-            var wordLength = word.length;
+            var wordLength = wordSymbols.length;
             var matchedRecords = currentWordRecordGroup.get('matchedRecords');
-            wordRecordHit(recordSequence, word).forEach(function(startOffset) {
-                matchedRecords.addObject(store.createRecord('matchedRecord', {record: record, startOffset: startOffset, endOffset: startOffset + wordLength}));
+            wordRecordHit(recordSequence, wordSymbols).forEach(function (startOffset) {
+                matchedRecords.addObject(store.createRecord('matchedRecord', {
+                    record: record,
+                    startOffset: startOffset,
+                    endOffset: startOffset + wordLength,
+                    leftExtension: store.createRecord('extension').set('scores', []).set('dropOffs', []),
+                    rightExtension: store.createRecord('extension').set('scores', []).set('dropOffs', []),
+                    matchStartOffset: startOffset,
+                    matchEndOffset: startOffset + wordLength,
+                    queryStartOffset: wordStartOffset,
+                    queryEndOffset: wordStartOffset + wordLength
+                }));
             });
         } else {
             this.set('stageCompleted', true);
@@ -255,7 +267,7 @@ Blast.SearchController = Ember.ObjectController.extend({
         },
         resetStage: function () {
             var self = this;
-            this.get('wordRecordGroups').forEach(function(wordRecordGroup){
+            this.get('wordRecordGroups').forEach(function (wordRecordGroup) {
                 wordRecordGroup.get('recordsToCheck').addObjects(self.model.records);
                 wordRecordGroup.get('matchedRecords').clear();
             });
@@ -264,13 +276,13 @@ Blast.SearchController = Ember.ObjectController.extend({
             this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', true);
         },
         nextStep: function () {
-            if(!this.get('stageCompleted')) {
+            if (!this.get('stageCompleted')) {
                 this._performNextStep();
             }
         },
         nextStage: function () {
             if (!this.get('stageCompleted')) {
-                while(!this.get('stageCompleted')) {
+                while (!this.get('stageCompleted')) {
                     this._performNextStep();
                 }
                 return;
@@ -291,79 +303,7 @@ Blast.ExtendRoute = Ember.Route.extend({
         return {
             symbols: this.store.findAll('sequenceSymbol'),
             scoring: this.store.findAll('scoring'),
-            //FIXME setup view model for 'extend'
-            wordGroups: [
-                Ember.Object.create({
-                    word: 'ACT',
-                    records: [
-                        Ember.Object.create({
-                            active: true,
-                            sequence: 'AAABBBCCC',
-                            sequenceRange: Ember.Object.create({from: 3, length: 5}),
-                            query: 'AAABBBCCC',
-                            queryRange: Ember.Object.create({from: 2, length: 5}),
-                            leftExtension: Ember.Object.create({
-                                score: Ember.A([3, 4]),
-                                dropOff: Ember.A([0, 0])
-                            }),
-                            rightExtension: Ember.Object.create({
-                                score: Ember.A([3, 4]),
-                                dropOff: Ember.A([0, 0])
-                            })
-                        }),
-                        Ember.Object.create({
-                            active: false,
-                            sequence: 'AAABBBCCC',
-                            sequenceRange: Ember.Object.create({from: 1, length: 3}),
-                            query: 'AAABBBCCC',
-                            queryRange: Ember.Object.create({from: 3, length: 3}),
-                            leftExtension: Ember.Object.create({
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            }),
-                            rightExtension: Ember.Object.create({
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            })
-                        })
-                    ]
-                }),
-                Ember.Object.create({
-                    word: 'ACT',
-                    records: [
-                        Ember.Object.create({
-                            active: false,
-                            sequence: 'AAABBBCCC',
-                            sequenceRange: Ember.Object.create({from: 0, length: 3}),
-                            query: 'AAABBBCCC',
-                            queryRange: Ember.Object.create({from: 3, length: 3}),
-                            leftExtension: {
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            },
-                            rightExtension: {
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            }
-                        }),
-                        Ember.Object.create({
-                            active: false,
-                            sequence: 'AAABBBCCC',
-                            sequenceRange: Ember.Object.create({from: 3, length: 3}),
-                            query: 'AAABBBCCC',
-                            queryRange: Ember.Object.create({from: 6, length: 3}),
-                            leftExtension: {
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            },
-                            rightExtension: {
-                                score: Ember.A([3]),
-                                dropOff: Ember.A([0])
-                            }
-                        })
-                    ]
-                })
-            ]
+            wordGroups: this.store.findAll('wordRecordGroup')
         };
     },
     setupController: function (controller, model) {
@@ -374,23 +314,145 @@ Blast.ExtendRoute = Ember.Route.extend({
         appController.set('nextStepButtonDisabled', false);
         appController.set('nextStageButtonDisabled', false);
         appController.set('outletController', controller);
+        var map = {};
+        model.scoring.then(function(scoring){
+            scoring.forEach(function (scoreEntry) {
+                var from = scoreEntry.get('fromSymbol.symbol');
+                var to = scoreEntry.get('toSymbol.symbol');
+                var score = scoreEntry.get('score');
+                if (!map.hasOwnProperty(from)) {
+                    map[from] = {};
+                }
+                map[from][to] = score;
+            });
+        });
+        if (controller._expander == null) {
+            controller._expander = new Expander();
+        }
+        controller._expander.similarityMatrix = map;
+        controller._expander.maxPenalty = appController.get('scoreDropOff');
     }
 });
 
 Blast.ExtendController = Ember.ObjectController.extend({
     needs: ['application'],
+    _expander: null,
+    stageCompleted: function () {
+        return this.get('wordGroups').every(function (wordGroup) {
+            return wordGroup.get('matchedRecords').every(function (match) {
+                return match.get('extended');
+            });
+        });
+    }.property('wordGroups'),
+    _performNextStep: function (forAll) {
+        var matchedRecord = undefined;
+        var wordGroupRef = this.get('wordGroups').find(function (wordGroup) {
+            var find = wordGroup.get('matchedRecords').find(function (match) {
+                if (match.get('extended')) {
+                    match.set('active', false);
+                    return false;
+                } else {
+                    matchedRecord = match;
+                    return true;
+                }
+            });
+            return find !== undefined;
+        });
+        if (matchedRecord !== undefined) {
+            if (!matchedRecord.get('active')) {
+                matchedRecord.set('active', true);
+                this._expander.resetState();
+                this._expander.record = matchedRecord.get('record.sequence');
+                this._expander.sequence = wordGroupRef.get('word.originalSequence.sequence');
+                this._expander.word = {
+                    off: {
+                        sequence: wordGroupRef.get('word.startOffset'),
+                        record: matchedRecord.get('startOffset')
+                    },
+                    length: wordGroupRef.get('word.symbols.length'),
+                    str: wordGroupRef.get('word.symbols')
+                };
+                var initialResult = this._expander.init();
+                this._processStepResult(matchedRecord, initialResult);
+                if (!forAll) {
+                    this._updateMatchRanges(matchedRecord);
+                    return;
+                }
+            }
+            var results;
+            if (forAll) {
+                this._processStepResult(matchedRecord, this._expander.getAll());
+                this._processBestMatchResult(matchedRecord, this._expander.getResult());
+            } else {
+                results = this._expander.getNext();
+                if (results != null) {
+                    this._processStepResult(matchedRecord, results);
+                    this._updateMatchRanges(matchedRecord);
+                } else {
+                    matchedRecord.set('extended', true);
+                    matchedRecord.set('active', false);
+                    this._processBestMatchResult(matchedRecord, this._expander.getResult());
+                }
+            }
+        }
+        this.set('stageCompleted', this.stageCompleted());
+    },
+    _processStepResult: function (matchRecord, results) {
+        matchRecord.set('leftExtension.scores', results.left.score);
+        matchRecord.set('leftExtension.dropOffs', results.left.penalty);
+        matchRecord.set('rightExtension.scores', results.right.score);
+        matchRecord.set('rightExtension.dropOffs', results.right.penalty);
+    },
+    _updateMatchRanges: function (matchRecord) {
+        var word = this._expander.word;
+        matchRecord.set('matchStartOffset', word.off.record);
+        matchRecord.set('matchEndOffset', word.off.record + word.size);
+        matchRecord.set('queryStartOffset', word.off.sequence);
+        matchRecord.set('queryEndOffset', word.off.sequence + word.size);
+    },
+    _processBestMatchResult: function (matchRecord, result) {
+        this._updateMatchRanges(matchRecord);
+        this.get('store').createRecord('result', {
+            record: matchRecord.get('record'),
+            startOffset: result.recordOff,
+            endOffset: result.recordOff + result.size,
+            score: result.score
+        });
+    },
     actions: {
         prevStage: function () {
             this.transitionToRoute('search');
         },
         resetStage: function () {
-            //TODO implement
+            this.get('wordGroups').forEach(function (wordGroup) {
+                wordGroup.get('matchedRecords').every(function (match) {
+                    match.set('active', false);
+                    match.set('extended', false);
+                    match.set('leftExtension.scores', []);
+                    match.set('leftExtension.dropOffs', []);
+                    match.set('rightExtension.scores', []);
+                    match.set('rightExtension.dropOffs', []);
+                    match.set('matchStartOffset', match.get('startOffset'));
+                    match.set('matchEndOffset', match.get('endOffset'));
+                    match.set('queryStartOffset', wordGroup.get('word.startOffset'));
+                    match.set('queryEndOffset', wordGroup.get('word.startOffset') + wordGroup.get('word.symbols.length'));
+                });
+            });
+            this.set('stageCompleted', false);
+            this.get('controllers.application.stages').findBy('resource', 'results').set('disabled', true);
         },
         nextStep: function () {
-            //TODO check is stage completed & perform step
+            if (!this.get('stageCompleted')) {
+                this._performNextStep(false);
+            }
         },
         nextStage: function () {
-            //TODO check is stage completed & perform all remain steps
+            if (!this.get('stageCompleted')) {
+                while (!this.get('stageCompleted')) {
+                    this._performNextStep(true);
+                }
+                return;
+            }
             this.get('controllers.application.stages').findBy('resource', 'results').set('disabled', false);
             this.transitionToRoute('results');
         }

@@ -29,12 +29,29 @@ Blast.SequenceRecord = DS.Model.extend({
 });
 
 /**
+ * Definicja encji przechowującej rozwinięcie oceny dla rozszerzenia dopasowania
+ * @type {*|void}
+ */
+Blast.Extension = DS.Model.extend({
+    scores: DS.attr(), //as array
+    dropOffs: DS.attr() //as array
+});
+
+/**
  * Definicja encji definiującej rekord "bazy danych", który zawiera dopasowanie słowa
  */
 Blast.MatchedRecord = DS.Model.extend({
     record: DS.belongsTo('sequenceRecord'),
     startOffset: DS.attr('number'),
-    endOffset: DS.attr('number')
+    endOffset: DS.attr('number'),
+    active: DS.attr('boolean', {defaultValue: false}),
+    extended: DS.attr('boolean', {defaultValue: false}),
+    leftExtension: DS.belongsTo('extension'),
+    rightExtension: DS.belongsTo('extension'),
+    matchStartOffset: DS.attr('number'),
+    matchEndOffset: DS.attr('number'),
+    queryStartOffset: DS.attr('number'),
+    queryEndOffset: DS.attr('number')
 });
 /**
  * Definicja encji definiującej relację słowa z rekordami bazy danych - grupuje rekordy sprawdzone i te które jeszcze zostały do sprawdzenia
@@ -48,7 +65,8 @@ Blast.WordRecordGroup = DS.Model.extend({
 Blast.Result = DS.Model.extend({
     record: DS.belongsTo('sequenceRecord'),
     startOffset: DS.attr('number'),
-    endOffset: DS.attr('number')
+    endOffset: DS.attr('number'),
+    score: DS.attr('number')
 });
 
 /**
