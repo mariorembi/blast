@@ -187,12 +187,12 @@ function Expander() {
         var leftBest = getBest(expandLeft.score);
         var rightBest = getBest(expandRight.score);
         console.log("Left best: " + leftBest + " right best: " + rightBest);
-        var leftOff = this.word.off.record - leftBest;
+        var left = this.word.off.record - leftBest;
         var size = this.word.off.record - leftOff + this.word.size + rightBest;
-        var bestSubRec = this.record.substr(leftOff, size);
+        var bestSubRec = this.record.substr(left, size);
 
-        leftOff = this.word.off.sequence - leftBest;
-        var bestSubSeq = this.sequence.substr(leftOff, size);
+        left = this.word.off.sequence - leftBest;
+        var bestSubSeq = this.sequence.substr(left, size);
         console.log(bestSubRec);
         console.log(bestSubSeq);
         var bestScore = countScore(bestSubRec, bestSubSeq, this.similarityMatrix);

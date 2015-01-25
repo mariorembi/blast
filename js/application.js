@@ -369,7 +369,7 @@ Blast.ExtendController = Ember.ObjectController.extend({
                         sequence: wordGroupRef.get('word.startOffset'),
                         record: matchedRecord.get('startOffset')
                     },
-                    length: wordGroupRef.get('word.symbols.length'),
+                    size: wordGroupRef.get('word.symbols.length'),
                     str: wordGroupRef.get('word.symbols')
                 };
                 var initialResult = this._expander.init();
