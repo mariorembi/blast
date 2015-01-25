@@ -32,6 +32,11 @@ Blast.ScoringMatrixComponent = Ember.Component.extend({
     }.property('scoring', 'columnHeaders')
 });
 
+Blast.WordSearchComponent = Ember.Component.extend({
+    tagName: 'div',
+    classNames: ['form-group']
+});
+
 Blast.RecordExtensionComponent = Ember.Component.extend({
     tagName: 'pre',
     classNameBindings: ['highlightRecord'],

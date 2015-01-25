@@ -137,7 +137,8 @@ Blast.InitRoute = Ember.Route.extend({
     model: function () {
         return {
             query: this.store.find('querySequence', '1'),
-            words: this.store.findAll('word')
+            words: this.store.findAll('word'),
+            records: this.store.findAll('sequenceRecord')
         };
     },
     setupController: function (controller, model) {
@@ -153,18 +154,45 @@ Blast.InitRoute = Ember.Route.extend({
 
 Blast.InitController = Ember.ObjectController.extend({
     needs: ['application'],
+    stageCompleted: function() {
+        return this.get('words.length') > 0;
+    }.property('words'),
+    _performNextStep: function() {
+        var query = this.get('query');
+        var self = this;
+        wordSplit(query.get('sequence'), this.get('controllers.application.wordLength')).forEach(function(wordDescriptor){
+            var store = self.get('store');
+            var word = store.createRecord('word', {
+                startOffset: wordDescriptor.off,
+                symbols: wordDescriptor.word,
+                originalSequence: query
+            });
+            store.createRecord('wordRecordGroup', {word: word}).get('recordsToCheck').addObjects(self.model.records);
+        });
+        this.set('stageCompleted', true);
+    },
     actions: {
         prevStage: function () {
             this.transitionToRoute('configuration');
         },
         resetStage: function () {
             this.store.unloadAll('word');
+            this.store.unloadAll('wordRecordGroup');
+            this.set('stageCompleted', false);
+            this.get('controllers.application.stages').findBy('resource', 'search').set('disabled', true);
         },
         nextStep: function () {
-            //TODO check is stage completed & perform step
+            if(!this.get('stageCompleted')) {
+                this._performNextStep();
+            }
         },
         nextStage: function () {
-            //TODO check is stage completed & perform all remain steps
+            if (!this.get('stageCompleted')) {
+                while(!this.get('stageCompleted')) {
+                    this._performNextStep();
+                }
+                return;
+            }
             this.get('controllers.application.stages').findBy('resource', 'search').set('disabled', false);
             this.transitionToRoute('search');
         }
@@ -179,7 +207,8 @@ Blast.SearchRoute = Ember.Route.extend({
     },
     model: function () {
         return {
-            //TODO setup view model for 'search'
+            wordRecordGroups: this.store.findAll('wordRecordGroup'),
+            records: this.store.findAll('sequenceRecord')
         };
     },
     setupController: function (controller, model) {
@@ -195,18 +224,57 @@ Blast.SearchRoute = Ember.Route.extend({
 
 Blast.SearchController = Ember.ObjectController.extend({
     needs: ['application'],
+    stageCompleted: function() {
+        return this.get('wordRecordGroups').find(function(wordRecordGroup){
+            return wordRecordGroup.get('recordsToCheck.length') > 0;
+        }) === undefined;
+    }.property('wordRecordGroups'),
+    _performNextStep: function() {
+        var query = this.get('query');
+        var self = this;
+        var currentWordRecordGroup = this.get('wordRecordGroups').find(function(wordRecordGroup){
+            return wordRecordGroup.get('recordsToCheck.length') > 0;
+        });
+        if (currentWordRecordGroup !== undefined) {
+            var record = currentWordRecordGroup.get('recordsToCheck').shiftObject();
+            var recordSequence = record.get('sequence');
+            var word = currentWordRecordGroup.get('word.symbols');
+            var store = self.get('store');
+            var wordLength = word.length;
+            var matchedRecords = currentWordRecordGroup.get('matchedRecords');
+            wordRecordHit(recordSequence, word).forEach(function(startOffset) {
+                matchedRecords.addObject(store.createRecord('matchedRecord', {record: record, startOffset: startOffset, endOffset: startOffset + wordLength}));
+            });
+        } else {
+            this.set('stageCompleted', true);
+        }
+    },
     actions: {
         prevStage: function () {
             this.transitionToRoute('init');
         },
         resetStage: function () {
-            //TODO implement
+            var self = this;
+            this.get('wordRecordGroups').forEach(function(wordRecordGroup){
+                wordRecordGroup.get('recordsToCheck').addObjects(self.model.records);
+                wordRecordGroup.get('matchedRecords').clear();
+            });
+            this.get('store').unloadAll('matchedRecord');
+            this.set('stageCompleted', false);
+            this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', true);
         },
         nextStep: function () {
-            //TODO check is stage completed & perform step
+            if(!this.get('stageCompleted')) {
+                this._performNextStep();
+            }
         },
         nextStage: function () {
-            //TODO check is stage completed & perform all remain steps
+            if (!this.get('stageCompleted')) {
+                while(!this.get('stageCompleted')) {
+                    this._performNextStep();
+                }
+                return;
+            }
             this.get('controllers.application.stages').findBy('resource', 'extend').set('disabled', false);
             this.transitionToRoute('extend');
         }
@@ -313,7 +381,7 @@ Blast.ExtendController = Ember.ObjectController.extend({
     needs: ['application'],
     actions: {
         prevStage: function () {
-            this.transitionToRoute('evaluation');
+            this.transitionToRoute('search');
         },
         resetStage: function () {
             //TODO implement

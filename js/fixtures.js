@@ -27,38 +27,8 @@ Blast.QuerySequence.FIXTURES = [
         sequence: 'ATTAGAC'
     }
 ];
-Blast.Word.FIXTURES = [
-    {
-        id: '1',
-        symbols: 'ATT',
-        startOffset: 0,
-        originalSequence: '1'
-    },
-    {
-        id: '2',
-        symbols: 'TTA',
-        startOffset: 1,
-        originalSequence: '1'
-    },
-    {
-        id: '3',
-        symbols: 'TAG',
-        startOffset: 2,
-        originalSequence: '1'
-    },
-    {
-        id: '4',
-        symbols: 'AGA',
-        startOffset: 3,
-        originalSequence: '1'
-    },
-    {
-        id: '5',
-        symbols: 'GAC',
-        startOffset: 4,
-        originalSequence: '1'
-    }
-];
+
+Blast.Word.FIXTURES = [];
 /**
  * Definicje rekordów "bazy danych"
  * @type {{id: string, sequence: string}[]}
@@ -70,6 +40,9 @@ Blast.SequenceRecord.FIXTURES = [
     }
 ];
 
+Blast.MatchedRecord.FIXTURES = [];
+
+Blast.WordRecordGroup.FIXTURES = [];
 /**
  * Definicje kar i nagród dla dopasowań symboli słownika sekwencji
  * @type {{id: string, fromSymbol: string, toSymbol: string, score: number}[]}

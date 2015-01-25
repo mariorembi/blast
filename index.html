@@ -108,8 +108,9 @@
 
 <script type="text/x-handlebars" id="search">
     <div class="form-horizontal">
-        <comment>(empty)</comment>
-        <!--TODO implement 'search' view template-->
+        {{#each wordRecordGroup in wordRecordGroups}}
+            {{word-search wordRecordGroup=wordRecordGroup}}
+        {{/each}}
     </div>
 </script>
 
@@ -186,6 +187,41 @@
         {{/each}}
         </tbody>
     </table>
+</script>
+
+<script type="text/x-handlebars" id="components/word-search">
+    <div class="form-group">
+        <label class="col-sm-1 control-label">Word</label>
+        <div class="col-sm-1">
+            {{input value=wordRecordGroup.word.symbols disabled=true class="form-control"}}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">Matched records</label>
+        <div class="col-sm-9">
+            <ul class="list-group">
+                {{#each result in wordRecordGroup.matchedRecords}}
+                {{result-item result=result}}
+                {{else}}
+                <comment>(no matches)</comment>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+    {{#if wordRecordGroup.recordsToCheck}}
+    <div class="form-group">
+        <label class="col-sm-1 control-label">Records to check</label>
+        <div class="col-sm-9">
+            <ul class="list-group">
+                {{#each record in wordRecordGroup.recordsToCheck}}
+                <li class="list-group-item">{{record.sequence}}</li>
+                {{else}}
+                <comment>There is no database records</comment>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+    {{/if}}
 </script>
 
 <script type="text/x-handlebars" id="components/record-extension">

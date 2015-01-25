@@ -51,7 +51,7 @@ test('word splitting-size whole', function() {
     equal(words.length, 1, "Amount of words ok");
     equal(words[0].word, sequence, "Sequence ok");
     equal(words[0].off, 0, "Offset ok");
-})
+});
 
 test('record hit', function() {
     var word = 'AAA';
@@ -62,7 +62,7 @@ test('record hit', function() {
     for (var i = 0; i < result.length; i++) {
         equal(result[i], i, "Record and word hit");
     }
-})
+});
 
 test('record hit 2', function() {
     var word = 'ACAC';
@@ -73,7 +73,7 @@ test('record hit 2', function() {
     for (var i = 0; i < result.length; i++) {
         equal(result[i], 2 * i, "Record and word hit");
     }
-})
+});
 
 test('database search', function() {
 	var word = 'AAAA';
@@ -87,7 +87,7 @@ test('database search', function() {
 	equal(result[0].hits[1], 8, 'Offset of hit');
 	equal(result[1].hits.length, 1, 'Amount of hits found for record');
 	equal(result[1].hits[0], 4, 'Offset of hit');
-})
+});
 
 var test_expanding = function(sequence, record, word, map, maxPenalty, maxScore, expectedLeft, expectedRight, expectedResult) {
     var expandTest = new Expander();
@@ -138,7 +138,7 @@ var test_expanding = function(sequence, record, word, map, maxPenalty, maxScore,
     equal(steps, Math.max(expectedLeft.score.length, expectedRight.score.length));
     var result = expandTest.getResult();
     deepEqual(result, expectedResult, "Result ok");
-}
+};
 
 test('expander-simple', function() {
 	var sequence = 'TTTAAATTT';
@@ -156,7 +156,7 @@ test('expander-simple', function() {
     };
 
     test_expanding(sequence, record, word, map, 2, -1, expectedLeft, expectedRight, expectedResult);
-})
+});
 
 test('expander-simple2', function() {
     var sequence = 'TTTTTGCGCAAAGGGGTTTTT';
@@ -173,4 +173,4 @@ test('expander-simple2', function() {
     };
 
     test_expanding(sequence, record, word, map, 2, -1, expectedLeft, expectedRight, expectedResult);
-})
+});

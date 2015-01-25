@@ -28,6 +28,23 @@ Blast.SequenceRecord = DS.Model.extend({
     sequence: DS.attr('string')
 });
 
+/**
+ * Definicja encji definiującej rekord "bazy danych", który zawiera dopasowanie słowa
+ */
+Blast.MatchedRecord = DS.Model.extend({
+    record: DS.belongsTo('sequenceRecord'),
+    startOffset: DS.attr('number'),
+    endOffset: DS.attr('number')
+});
+/**
+ * Definicja encji definiującej relację słowa z rekordami bazy danych - grupuje rekordy sprawdzone i te które jeszcze zostały do sprawdzenia
+ */
+Blast.WordRecordGroup = DS.Model.extend({
+   word: DS.belongsTo('word'),
+   recordsToCheck: DS.hasMany('sequenceRecord'),
+   matchedRecords: DS.hasMany('matchedRecord')
+});
+
 Blast.Result = DS.Model.extend({
     record: DS.belongsTo('sequenceRecord'),
     startOffset: DS.attr('number'),
