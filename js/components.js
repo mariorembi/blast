@@ -73,8 +73,7 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         var leftScore = this.get('record.leftExtension.scores');
         scoreStr += leftScore.map(callback).join('');
         var rightScore = this.get('record.rightExtension.scores');
-        //FIXME blank space between scores
-        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftScore.length - rightScore.length).scatter();
+        scoreStr += ' '.repeat(this.get('word.symbols.length') - 2).scatter();
         scoreStr += rightScore.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.scores', 'record.rightExtension.scores', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset'),
@@ -86,8 +85,7 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
         var leftDropOff = this.get('record.leftExtension.dropOffs');
         var rightDropOff = this.get('record.rightExtension.dropOffs');
         scoreStr += leftDropOff.map(callback).join('');
-        //FIXME blank space between drop-offs
-        scoreStr += ' '.repeat(this.get('record.queryEndOffset') - this.get('record.queryStartOffset') - leftDropOff.length - rightDropOff.length).scatter();
+        scoreStr += ' '.repeat(this.get('word.symbols.length') - 2).scatter();
         scoreStr += rightDropOff.map(callback).join('');
         return scoreStr;
     }.property('record.leftExtension.dropOffs', 'record.rightExtension.dropOffs', 'record.matchStartOffset', 'record.queryStartOffset', 'record.queryEndOffset')
