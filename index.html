@@ -73,7 +73,7 @@
             <div class="col-sm-9">
                 <ul class="list-group">
                     {{#each record in records}}
-                    <li class="list-group-item">{{record.sequence}}{{#if enabled}}<span class="pull-right"><a {{action 'removeRecordSequence' record}}><span class="glyphicon glyphicon-trash"></span></a></span>{{/if}}</li>
+                    <li class="list-group-item breakable">{{record.sequence}}{{#if enabled}}<span class="pull-right"><a {{action 'removeRecordSequence' record}}><i class="glyphicon glyphicon-trash"></i></a></span>{{/if}}</li>
                     {{else}}
                     <comment>There is no database records</comment>
                     {{/each}}
@@ -132,7 +132,7 @@
         {{#if wordGroup.matchedRecords}}
         <div class="form-group">
             <label class="col-sm-1 control-label">Word</label>
-            <div class="col-sm-1">
+            <div class="col-sm-3">
                 {{input value=wordGroup.word.symbols disabled=true class="form-control"}}
             </div>
         </div>
@@ -229,7 +229,7 @@
 <script type="text/x-handlebars" id="components/word-search">
     <div class="form-group">
         <label class="col-sm-1 control-label">Word</label>
-        <div class="col-sm-1">
+        <div class="col-sm-3">
             {{input value=wordRecordGroup.word.symbols disabled=true class="form-control"}}
         </div>
     </div>

@@ -70,7 +70,7 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
             return number.asScatteredString();
         };
         var leftScore = this.get('record.leftExtension.scores');
-        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')) - leftScore.length + 1).scatter();
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         scoreStr += leftScore.map(callback).reverse().join('');
         var rightScore = this.get('record.rightExtension.scores');
         scoreStr += ' '.repeat(this.get('word.symbols.length') - 2).scatter();
@@ -82,7 +82,7 @@ Blast.RecordExtensionComponent = Ember.Component.extend({
             return number.asScatteredString();
         };
         var leftDropOff = this.get('record.leftExtension.dropOffs');
-        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset')) - leftDropOff.length + 1).scatter();
+        var scoreStr = ' '.repeat(Math.max(this.get('record.matchStartOffset'), this.get('record.queryStartOffset'))).scatter();
         var rightDropOff = this.get('record.rightExtension.dropOffs');
         scoreStr += leftDropOff.map(callback).reverse().join('');
         scoreStr += ' '.repeat(this.get('word.symbols.length') - 2).scatter();

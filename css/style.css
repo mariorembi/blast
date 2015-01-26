@@ -31,3 +31,7 @@ pre {
 .score {
     margin-right: 10px;
 }
+
+.breakable {
+    word-break: break-all;
+}

@@ -411,10 +411,10 @@ Blast.ExtendController = Ember.ObjectController.extend({
     },
     _updateMatchRanges: function (matchRecord) {
         var word = this._expander.word;
-        matchRecord.set('matchStartOffset', word.off.record);
-        matchRecord.set('matchEndOffset', word.off.record + word.size);
-        matchRecord.set('queryStartOffset', word.off.sequence);
-        matchRecord.set('queryEndOffset', word.off.sequence + word.size);
+        matchRecord.set('matchStartOffset', word.off.record + 1 - matchRecord.get('leftExtension.scores.length'));
+        matchRecord.set('matchEndOffset', word.off.record - 1 + word.size + matchRecord.get('rightExtension.scores.length'));
+        matchRecord.set('queryStartOffset', word.off.sequence + 1 - matchRecord.get('leftExtension.scores.length'));
+        matchRecord.set('queryEndOffset', word.off.sequence - 1 + word.size + matchRecord.get('rightExtension.scores.length'));
     },
     _processBestMatchResult: function (matchRecord, result) {
         this._updateMatchRanges(matchRecord);
