@@ -32,6 +32,16 @@ Blast.ScoringMatrixComponent = Ember.Component.extend({
     }.property('scoring', 'columnHeaders')
 });
 
+Blast.ScoringMatrixEntryComponent = Ember.Component.extend({
+    tagName: 'td',
+    classNames: ['form-group'],
+    classNameBindings: ['valueInvalid:has-error'],
+    valueInvalid: function() {
+        var invalid = !/^-?\d+$/.test(this.get('value.score'));
+        return invalid;
+    }.property('value.score')
+});
+
 Blast.WordSearchComponent = Ember.Component.extend({
     tagName: 'div',
     classNames: ['form-group']

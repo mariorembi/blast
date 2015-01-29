@@ -50,22 +50,22 @@
             </div>
         </div>
         {{/if}}
-        <div class="form-group">
+        <div {{bind-attr class=":form-group queryInvalid:has-error"}}>
             <label class="col-sm-3 control-label">Query sequence</label>
             <div class="col-sm-9">
                 {{input value=query.sequence placeholder="Type a DNA sequence" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
-        <div class="form-group">
+        <div {{bind-attr class=":form-group wordLengthInvalid:has-error"}}>
             <label class="col-sm-3 control-label">Word length</label>
             <div class="col-sm-3">
-                {{input value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control" disabled=disabled}}
+                {{input type='number' value=controllers.application.wordLength size=2 placeholder="Set length of a word" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
-        <div class="form-group">
+        <div {{bind-attr class=":form-group scoreDropOffInvalid:has-error"}}>
             <label class="col-sm-3 control-label">Score drop off</label>
             <div class="col-sm-3">
-                {{input value=controllers.application.scoreDropOff size=4 placeholder="Set minimal scoring threshold" required=true class="form-control" disabled=disabled}}
+                {{input type='number' value=controllers.application.scoreDropOff size=4 placeholder="Set minimal scoring threshold" required=true class="form-control" disabled=disabled}}
             </div>
         </div>
         <div class="form-group">
@@ -78,6 +78,11 @@
                     <comment>There is no database records</comment>
                     {{/each}}
                 </ul>
+            </div>
+        </div>
+        <div {{bind-attr class=":form-group newSequenceInvalid:has-error"}}>
+            <label class="col-sm-3 control-label">DNA database records</label>
+            <div class="col-sm-9">
                 {{input value=newSequenceRecord placeholder="Type a new DNA database record" class="form-control" disabled=disabled}}
                 <br/>
                 <div class="btn-group">
@@ -218,12 +223,16 @@
         <tr>
             <td><label class="matrix-row-header">{{row.rowHeader}}</label></td>
             {{#each value in row.values}}
-            <td>{{input size=3 value=value.score class="form-control" disabled=disabled}}</td>
+            {{scoring-matrix-entry value=value}}
             {{/each}}
         </tr>
         {{/each}}
         </tbody>
     </table>
+</script>
+
+<script type="text/x-handlebars" id="components/scoring-matrix-entry">
+    {{input type='number' size=3 value=value.score class="form-control" disabled=disabled}}
 </script>
 
 <script type="text/x-handlebars" id="components/word-search">

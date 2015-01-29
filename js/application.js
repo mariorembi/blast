@@ -98,23 +98,48 @@ Blast.ConfigurationController = Ember.ObjectController.extend({
     enabled: function() {
         return !this.get('disabled');
     }.property('disabled'),
+    queryInvalid: function(){
+        return !/^[ACGT]+$/i.test(this.get('query.sequence'));
+    }.property('query.sequence'),
+    newSequenceInvalid: function(){
+        return !/^[ACGT]*$/i.test(this.get('newSequenceRecord'));
+    }.property('newSequenceRecord.length'),
+    wordLengthInvalid: function(){
+        return !/^\d+$/.test(this.get('controllers.application.wordLength'));
+    }.property('controllers.application.wordLength'),
+    scoreDropOffInvalid: function(){
+        return !/^\d+$/.test(this.get('controllers.application.scoreDropOff'));
+    }.property('controllers.application.scoreDropOff'),
+    scoreMatrixInvalid: true,
+    formValid: function(){
+        return !(
+            this.get('queryInvalid') || this.get('wordLengthInvalid')
+            || this.get('scoreDropOffInvalid') || this.get('scoreMatrixInvalid')
+        );
+    }.property('queryInvalid', 'wordLengthInvalid', 'scoreDropOffInvalid', 'scoreMatrixInvalid'),
     actions: {
         prevStage: Ember.K,
         resetStage: Ember.K,
         nextStep: Ember.K,
         nextStage: function () {
-            //FIXME validate configuration
+            if (this.get('form.invalid')) return;
             this.set('disabled', true);
             this.get('controllers.application.stages').findBy('resource', 'init').set('disabled', false);
             this.transitionToRoute('init');
         },
         removeRecordSequence: function (sequenceRecord) {
-            sequenceRecord.deleteRecord();
+            sequenceRecord.destroyRecord();
             return false;
         },
         addRecordSequence: function () {
-            this.store.createRecord('sequenceRecord', {sequence: this.newSequenceRecord});
-            this.set('newSequenceRecord', '');
+            if (!this.get('newSequenceInvalid')) {
+                if (this.get('newSequenceRecord.length') == 0) {
+                    this.set('newSequenceInvalid', true);
+                    return false;
+                }
+                this.store.createRecord('sequenceRecord', {sequence: this.newSequenceRecord});
+                this.set('newSequenceRecord', '');
+            }
             return false;
         },
         removeAllRecords: function () {
@@ -164,7 +189,7 @@ Blast.InitController = Ember.ObjectController.extend({
     needs: ['application'],
     stageCompleted: function () {
         return this.get('words.length') > 0;
-    }.property('words'),
+    }.property('words.length'),
     _performNextStep: function () {
         var query = this.get('query');
         var self = this;
